@@ -1,0 +1,33 @@
+{
+  "name": "@ihaz/react-ui-utils",
+  "version": "1.1.2-beta",
+  "description": "A general UI common methods for React Projects, supports React Dom and React Native.",
+  "type": "module",
+  "main": "lib/index.js",
+  "module": "lib/index.es.js",
+  "jsnext:main": "lib/index.es.js",
+  "files": [
+    "lib"
+  ],
+  "engines": {
+    "node": ">=14.0.0"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/IlanArellano/react-ui-utils.git"
+  },
+  "scripts": {
+    "build": "rollup -c",
+    "test": "jest --watchAll"
+  },
+  "keywords": [
+    "react",
+    "react-utils",
+    "react native"
+  ],
+  "author": "Ilan Arellano",
+  "license": "ISC",
+  "peerDependencies": {
+    "react": ">=16"
+  }
+}

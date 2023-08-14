@@ -1,0 +1,33 @@
+{
+  "name": "@ihaz/js-ui-utils",
+  "version": "1.0.0-alpha",
+  "description": "A general UI common methods for javascript.",
+  "type": "module",
+  "main": "lib/index.js",
+  "module": "lib/index.es.js",
+  "jsnext:main": "lib/index.es.js",
+  "files": [
+    "lib"
+  ],
+  "engines": {
+    "node": ">=14.0.0"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/IlanArellano/react-ui-utils.git"
+  },
+  "scripts": {
+    "build": "rollup -c",
+    "test": "jest --watchAll"
+  },
+  "keywords": [
+    "react",
+    "react-utils",
+    "react native"
+  ],
+  "author": "Ilan Arellano",
+  "license": "ISC",
+  "peerDependencies": {
+    "react": ">=16"
+  }
+}
