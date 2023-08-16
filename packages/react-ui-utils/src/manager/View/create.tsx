@@ -7,11 +7,11 @@ import {
   ViewManagerComponentProps,
 } from "./manager";
 import { ViewProps } from "./comp";
-import createUncontrolledClassComponent, {
-  UncontrolledComponent,
-} from "@utils/components/uncontrolled";
 import { TreeComponent, registerTreeComponent } from "./registerTreeComponent";
 import { ViewTree } from "./tree";
+import createUncontrolledClassComponent, {
+  UncontrolledComponent,
+} from "@utils/utils/uncontrolled";
 
 export interface ViewUncontrolledComp
   extends UncontrolledComponent<ViewManagerComponentProps> {

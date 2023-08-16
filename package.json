@@ -8,7 +8,7 @@
     "build": "npm run build --workspaces --if-present"
   },
   "author": "Ilan Arellano",
-  "license": "ISC",
+  "license": "MIT",
   "devDependencies": {
     "@rollup/plugin-alias": "^5.0.0",
     "@rollup/plugin-commonjs": "^25.0.3",
