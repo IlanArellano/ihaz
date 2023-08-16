@@ -1,4 +1,4 @@
-import { BaseHandler } from "@utils/common/classes/ValueHandler";
+import { BaseHandler } from "@ihaz/js-ui-utils";
 
 export type Value<IValue> = IValue | (() => IValue);
 

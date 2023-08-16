@@ -1,4 +1,4 @@
-import { mapObject } from "@utils/common";
+import { CommonObject } from "@ihaz/js-ui-utils";
 import {
   CacheConfig,
   CacheResource,
@@ -89,31 +89,42 @@ export function cacheResourceFuncs<T extends Resource<string>>(
 ): T {
   const cacheKeys = (resourceConf && resourceConf.cache) || [];
   const clearKeys = (resourceConf && resourceConf.clear) || [];
-  const ret = mapObject(resource, (value, key) => (...args: any[]): any => {
-    const usarCache = cacheKeys.some((x) => (x as string) === key);
-    const limpiar = clearKeys.some((x) => (x as string) === key);
+  const ret = CommonObject.mapObject(
+    resource,
+    (value, key) =>
+      (...args: any[]): any => {
+        const usarCache = cacheKeys.some((x) => (x as string) === key);
+        const limpiar = clearKeys.some((x) => (x as string) === key);
 
-    const onCall = () => {
-      if (limpiar) {
-        dispatch({ type: "clear", payload: { config: resourceConf || {} } });
+        const onCall = () => {
+          if (limpiar) {
+            dispatch({
+              type: "clear",
+              payload: { config: resourceConf || {} },
+            });
+          }
+        };
+
+        const cache = get();
+
+        //Si no se ocupa usar el cache se realiza la llamada igual pero con un emptyCache y un fDispatch que no hace nada
+        const fCache = ((usarCache && cache[key]) || EMPTY_FUNCTION_CACHE)!;
+        const fDispatch = getFuncCacheDispatch(
+          dispatch,
+          key as string,
+          !usarCache
+        );
+
+        return cacheCall(
+          fCache,
+          config,
+          fDispatch,
+          value as any,
+          args,
+          onCall
+        ) as T;
       }
-    };
-
-    const cache = get();
-
-    //Si no se ocupa usar el cache se realiza la llamada igual pero con un emptyCache y un fDispatch que no hace nada
-    const fCache = ((usarCache && cache[key]) || EMPTY_FUNCTION_CACHE)!;
-    const fDispatch = getFuncCacheDispatch(dispatch, key as string, !usarCache);
-
-    return cacheCall(
-      fCache,
-      config,
-      fDispatch,
-      value as any,
-      args,
-      onCall
-    ) as T;
-  });
+  );
 
   return ret as any as T;
 }

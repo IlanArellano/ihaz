@@ -1,6 +1,6 @@
 import { CommonObject } from "@utils/namespaces";
 
-abstract class BaseHandler<T> {
+export abstract class BaseHandler<T> {
   abstract value: T;
 
   getDeepCopy() {

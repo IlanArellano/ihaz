@@ -14,7 +14,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/IlanArellano/react-ui-utils.git"
+    "url": "git+https://github.com/IlanArellano/ihaz.git"
   },
   "scripts": {
     "build": "rollup -c",
@@ -29,5 +29,8 @@
   "license": "ISC",
   "peerDependencies": {
     "react": ">=16"
+  },
+  "dependencies": {
+    "@ihaz/js-ui-utils": "^1.0.1-alpha"
   }
 }

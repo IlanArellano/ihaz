@@ -16,7 +16,7 @@ import type {
   Dispatch,
 } from "react";
 import { ParametersWithoutFistParam, _Object } from "@utils/types";
-import { deepCopy } from "@utils/common";
+import { CommonObject } from "@ihaz/js-ui-utils";
 
 interface CustomComponentClass<
   IComponent extends ReactComponent,
@@ -168,7 +168,7 @@ export default function createUncontrolledClassComponent<
 
   const getInstance = () => instance;
 
-  const getStore = () => Object.freeze(deepCopy(_store));
+  const getStore = () => Object.freeze(CommonObject.DeepCopy(_store));
 
   const handleRef = (x: IComponent | null) => {
     instance = x;

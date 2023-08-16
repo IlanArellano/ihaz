@@ -1,5 +1,5 @@
+import { EventHandler } from "@ihaz/js-ui-utils";
 import { useImperativeHandle, useRef } from "react";
-import { EventHandler } from "../common/classes/EventHandler";
 
 const getId = (event: string) => `_${event}`;
 

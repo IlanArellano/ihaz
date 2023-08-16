@@ -1,8 +1,10 @@
 import { useCallback, useImperativeHandle, useMemo, useRef } from "react";
-import { Execute } from "@utils/common/namespaces/execute";
-import { ValueHandler } from "../common/classes/ValueHandler";
-import { Value, ValueHandlerResult, ValueSetter } from "@utils/types/ValueHandler";
-
+import {
+  Value,
+  ValueHandlerResult,
+  ValueSetter,
+} from "@utils/types/ValueHandler";
+import { Execute, ValueHandler } from "@ihaz/js-ui-utils";
 
 const init = <IValue>(initial?: IValue) =>
   new ValueHandler(initial) as ValueHandler<IValue>;

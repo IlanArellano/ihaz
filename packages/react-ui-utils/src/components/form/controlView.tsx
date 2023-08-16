@@ -1,8 +1,7 @@
 import React, { forwardRef, useEffect, useMemo, useState } from "react";
+import { CommonObject, Client } from "@ihaz/js-ui-utils";
 import { Form, Input } from "./FormComp";
 import type { FieldProps, FormProps } from "./index";
-import { Client } from "@utils/common/namespaces/client";
-import { omit } from "@utils/common";
 
 export const ControlView = forwardRef<
   any,
@@ -10,7 +9,7 @@ export const ControlView = forwardRef<
 >((props) => {
   const Component = props.render;
   const CompProps = useMemo(
-    () => omit(props, "field", "render", "value", "onChange"),
+    () => CommonObject.Omit(props, "field", "render", "value", "onChange"),
     [props]
   );
   const value = (props.value as any)?.[props.field];
@@ -35,7 +34,7 @@ export const ControlForm = forwardRef<
   const Component = props.render;
   const [update, setUpdate] = useState<boolean>(false);
   const CompProps = useMemo(
-    () => omit(props, "field", "render", "value", "onChange"),
+    () => CommonObject.Omit(props, "field", "render", "value", "onChange"),
     [props]
   );
 

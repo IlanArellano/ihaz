@@ -1,5 +1,4 @@
-import { EventHandler } from "@utils/common/classes/EventHandler";
-import { ValueHandler } from "@utils/common/classes/ValueHandler";
+import { EventHandler, ValueHandler } from "@ihaz/js-ui-utils";
 
 export type Status = "mounted" | "unmounted";
 

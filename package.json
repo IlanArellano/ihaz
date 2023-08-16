@@ -7,7 +7,6 @@
   "scripts": {
     "build": "npm run build --workspaces --if-present"
   },
-  "keywords": ["javascript utils", "react"],
   "author": "Ilan Arellano",
   "license": "ISC",
   "devDependencies": {

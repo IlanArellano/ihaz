@@ -1,4 +1,4 @@
-import { deepEqual, isPromiseLike } from "@utils/common";
+import { CommonObject, Validation } from "@ihaz/js-ui-utils";
 import {
   CacheEntry,
   CachePayload,
@@ -20,11 +20,13 @@ function syncCacheCall(
   /**Indica si la función devolvió una promesa */
   async: boolean;
 } {
-  const entry = cache.entries.find((entry) => deepEqual(entry.args, args));
+  const entry = cache.entries.find((entry) =>
+    CommonObject.DeepEqual(entry.args, args)
+  );
   const value = entry ? entry.value.payload : func(...args);
 
   const cached = !!entry;
-  const async = entry ? entry.value.async : isPromiseLike(value);
+  const async = entry ? entry.value.async : Validation.isPromiseLike(value);
   const newEntry: CacheEntry | undefined = cached
     ? undefined
     : {
@@ -66,7 +68,7 @@ export function cacheCall<TFunc extends (...args: any[]) => any>(
       },
     });
 
-    if (isPromiseLike(result.result)) {
+    if (Validation.isPromiseLike(result.result)) {
       //Agrega la entrada al cache, note que no devolvemos la promesa resultante de la función,
       //si no que agregamos la promesa generada por 'ret':
       //Ruta asincrona para verificar que la promesa no devuelva una excepción:
@@ -124,7 +126,7 @@ export function cacheCall<TFunc extends (...args: any[]) => any>(
     return newEntry.value.payload as any;
   }
 
-  if (result.async && !isPromiseLike(result.result)) {
+  if (result.async && !Validation.isPromiseLike(result.result)) {
     //Si la función originalmente fue asíncrona pero el resultado en el cache no es una promesa
     //Esto significa que la promesa ya se resolvió y que esta almacenado el valor síncrono en el cache
     //Se devuelve una promesa resulta inmediatamente

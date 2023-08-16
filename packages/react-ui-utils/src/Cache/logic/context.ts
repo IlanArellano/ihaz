@@ -1,4 +1,4 @@
-import { deepEqual } from "@utils/common";
+import { CommonObject } from "@ihaz/js-ui-utils";
 import {
   AppCacheAction,
   CacheEntry,
@@ -25,7 +25,7 @@ export function setCacheEntry(
   entry: CacheEntry
 ): FunctionCache {
   const index = (cache.entries || []).findIndex((x) =>
-    deepEqual(x.args, entry.args)
+    CommonObject.DeepEqual(x.args, entry.args)
   );
   if (index !== -1) {
     return {

@@ -1,26 +1,21 @@
 import {
-  ViewManager,
-  createFormManager,
-  createUncontrolledClassComponent,
-} from "./components";
-import { Sleep, omit } from "./common";
-import {
   useEffectAsync,
   useEffectInterval,
   useEventHandler,
   useValueHandler,
 } from "./hooks";
-import { CacheResource } from "./components/Cache";
+import { ViewManager } from "./manager";
+import { createFormManager } from "./components";
+import createUncontrolledClassComponent from "./utils/uncontrolled";
+import { CacheResource } from "./Cache";
 
 export {
   ViewManager,
   createFormManager,
   createUncontrolledClassComponent,
-  Sleep,
-  omit,
   useEffectAsync,
   useEffectInterval,
   useEventHandler,
   useValueHandler,
-  CacheResource
+  CacheResource,
 };

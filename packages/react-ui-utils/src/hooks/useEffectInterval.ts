@@ -1,4 +1,4 @@
-import { IntervalHandler } from "@utils/common/classes/IntervalHandler";
+import { IntervalHandler } from "@ihaz/js-ui-utils";
 import { EffectCallback, useEffect, DependencyList } from "react";
 
 type EffectResult = void | EffectCallback;

@@ -1,3 +1,4 @@
+import { Stack } from "@ihaz/js-ui-utils";
 import React, { PureComponent } from "react";
 import {
   type ViewComponentProps,
@@ -5,7 +6,6 @@ import {
   type ViewProps,
   ViewMainComponent,
 } from "./comp";
-import { Sleep } from "@utils/common";
 import { EventHandlerRegister, VIEW_TREE_EVENT, ViewTree } from "./tree";
 export interface ShowFunc {
   <TResult>(
@@ -129,7 +129,9 @@ export class ViewManagerComponent extends PureComponent<
     return {
       start: (options) => {
         if (!options?.delay) return this.startModalSync(entry, context);
-        Sleep(options.delay).then(() => this.startModalSync(entry, context));
+        Stack.Sleep(options.delay).then(() =>
+          this.startModalSync(entry, context)
+        );
       },
       close: () => {
         this.handleCloseSync(entry.id);

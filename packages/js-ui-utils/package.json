@@ -1,6 +1,6 @@
 {
   "name": "@ihaz/js-ui-utils",
-  "version": "1.0.0-alpha",
+  "version": "1.0.1-alpha",
   "description": "A general UI common methods for javascript.",
   "type": "module",
   "main": "lib/index.js",
@@ -14,7 +14,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/IlanArellano/react-ui-utils.git"
+    "url": "git+https://github.com/IlanArellano/ihaz.git"
   },
   "scripts": {
     "build": "rollup -c",

@@ -7,11 +7,9 @@ import React, {
   useMemo,
   useState,
 } from "react";
+import { CommonObject, EventHandler, ValueHandler } from "@ihaz/js-ui-utils";
 import { ItemManager } from "@utils/types/validation";
 import { ControlForm, ControlView } from "./controlView";
-import { EventHandler, getEventId } from "@utils/common/classes/EventHandler";
-import { ValueHandler } from "@utils/common/classes/ValueHandler";
-import { ChangeValueFromObject } from "@utils/common";
 
 type ValidationPredicate<IValue> = (value: IValue) => boolean;
 
@@ -94,6 +92,8 @@ const CheckValidation = <T,>(
     return v === true;
   });
 
+const getEventId = (event: string) => `_${event}`;
+
 /**
  *
  * ```ts
@@ -149,7 +149,7 @@ export function createFormManager<T extends { [key: string]: any }>(
       this.state = {
         value: initial,
         validationResolved: validation
-          ? ChangeValueFromObject(validation as T, false, true)
+          ? CommonObject.ChangeValueFromObject(validation as T, false, true)
           : {},
       };
     }
