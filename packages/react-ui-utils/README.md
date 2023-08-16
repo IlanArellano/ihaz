@@ -7,11 +7,21 @@ A general UI common methods for general React Projects including React Dom and R
 This library provides the following utilities:
 
 - Cache
-  - [Cache Resource](https://www.npmjs.com/package/@ihaz/react-ui-utils)
+  - [CacheResource](https://www.npmjs.com/package/@ihaz/react-ui-utils)
+    - [createCacheResources](https://www.npmjs.com/package/@ihaz/react-ui-utils)
+    - [clearCacheByResource](https://www.npmjs.com/package/@ihaz/react-ui-utils)
+    - [clearAllCache](https://www.npmjs.com/package/@ihaz/react-ui-utils)
 - Managers
-  - [View Manager](https://www.npmjs.com/package/@ihaz/react-ui-utils)
+  - [ViewManager](https://www.npmjs.com/package/@ihaz/react-ui-utils)
+    - [createViewManager](https://www.npmjs.com/package/@ihaz/react-ui-utils)
 - Components
   - [createFormManager](https://www.npmjs.com/package/@ihaz/react-ui-utils)
+- Hooks
+  - [useEffectAsync](https://www.npmjs.com/package/@ihaz/react-ui-utils)
+  - [useEffectInterval](https://www.npmjs.com/package/@ihaz/react-ui-utils)
+  - [useValueHandler](https://www.npmjs.com/package/@ihaz/react-ui-utils)
+  - [useEventHandler](https://www.npmjs.com/package/@ihaz/react-ui-utils)
+  - [useLayoutEffectAsync](https://www.npmjs.com/package/@ihaz/react-ui-utils)
 - Other Utilities
   - [createUncontrolledClassComponent](https://www.npmjs.com/package/@ihaz/react-ui-utils)
 
