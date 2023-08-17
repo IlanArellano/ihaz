@@ -1,6 +1,6 @@
 import {
   useEffectAsync,
-  useEffectInterval,
+  useIntervalEffect,
   useEventHandler,
   useValueHandler,
 } from "./hooks";
@@ -14,7 +14,7 @@ export {
   createFormManager,
   createUncontrolledClassComponent,
   useEffectAsync,
-  useEffectInterval,
+  useIntervalEffect,
   useEventHandler,
   useValueHandler,
   CacheResource,

@@ -2,7 +2,7 @@ import { DependencyList, EffectCallback, useEffect } from "react";
 
 type EffectResult = void | EffectCallback;
 
-/**Effect  with same function tha `React.useEffect` that can be declared a promise in the callback
+/**Effect  with same function as `React.useEffect` that can be declared a promise in the callback
  * 
  * ```tsx
  * const Example = () => {

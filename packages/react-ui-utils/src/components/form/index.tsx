@@ -2,6 +2,7 @@ import React, {
   createContext,
   PropsWithChildren,
   PureComponent,
+  ReactNode,
   useContext,
   useEffect,
   useMemo,
@@ -25,7 +26,9 @@ interface FormValueState<T> {
 }
 
 interface FormValueStateResolved<T> {
+  /**Returns the current value from the internal form state */
   value: T | undefined;
+  /**Returns the current status from the internal form validation if `validate` params is declare */
   isValidated: boolean | undefined;
 }
 
@@ -47,6 +50,7 @@ export type FormProps<T, TProps extends { [k: string]: any }> = {
   render?: React.ComponentType<TProps>;
   ref?: React.Ref<any>;
   onSubmit?: (result: T) => void;
+  children?: ReactNode;
 } & (Partial<Pick<TProps, "value">> &
   Pick<TProps, Exclude<keyof TProps, "value" | "onChange" | "onSubmit">> & {
     onChange?: TProps["onChange"] | null;
@@ -60,6 +64,25 @@ export type FieldProps<TProps extends { [k: string]: any }, T> = {
   Pick<TProps, Exclude<keyof TProps, "value" | "onChange">> & {
     onChange?: TProps["onChange"] | null;
   });
+
+export interface FormManager<T> {
+  Form: <
+    TProps extends {
+      [k: string]: any;
+    } = React.InputHTMLAttributes<HTMLInputElement>
+  >(
+    props: FormProps<T, TProps>
+  ) => React.JSX.Element;
+  Field: <
+    TProps extends {
+      [k: string]: any;
+    } = React.InputHTMLAttributes<HTMLInputElement>
+  >(
+    props: FieldProps<TProps, T>
+  ) => React.JSX.Element;
+  Submit: ({ children }: PropsWithChildren) => React.JSX.Element | null;
+  useFormValue: () => FormValueStateResolved<T>;
+}
 
 const EvalValidation = <T, Key extends keyof T>(
   value: T[Key],
@@ -95,19 +118,48 @@ const CheckValidation = <T,>(
 const getEventId = (event: string) => `_${event}`;
 
 /**
+ * Returns a Form enviroment that provides a `Form` component that can be used and handled by internal state using a `Field`
+ * component that can change every prop from the state
+ * @param initial Initial value state
+ * @param validation A callback collection that evaluate a validation to every prop of the state 
  *
- * ```ts
- * // run typedoc --help for a list of supported languages
- * const instance = new MyClass();
+ * ```tsx
+ * const initial = {
+  name: "",
+  lastName: "",
+  age: 0,
+  birthAge: new Date(),
+};
+
+const { Form, Field, Submit, useFormValue } = createFormManager(initial, {
+  name: (value) => value.length > 10, // Validation for the name
+});
+ *const Component = () => {
+  const { value, isValidated } = useFormValue();
+
+  const onSubmit = (result: typeof initial) => {
+    console.log(result); // Current state of form value
+    //...
+  };
+
+  return (
+    <Form onSubmit={onSubmit}>
+      <Field field="name" />
+      <Field field="lastName" />
+      <Field field="birthAge" />
+      <Field field="age" />
+      <Submit>
+        <button type="submit">submit</button>
+      </Submit>
+    </Form>
+  );
+};
  * ```
- * @param initial
- * @param validation
- * @returns
  */
 export function createFormManager<T extends { [key: string]: any }>(
   initial: T,
   validation?: Validation<T>
-) {
+): FormManager<T> {
   if (!initial) throw new Error("initial form value not provided");
   if (typeof initial !== "object")
     throw new Error(
@@ -286,5 +338,10 @@ export function createFormManager<T extends { [key: string]: any }>(
     return value;
   }
 
-  return { Field, Form, useFormValue, Submit };
+  return {
+    Field,
+    Form: Form as unknown as FormManager<T>["Form"],
+    useFormValue,
+    Submit,
+  };
 }

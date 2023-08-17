@@ -12,7 +12,7 @@ export interface HandleEvents<IEvents, IValue> {
 }
 
 /**
- * Hook that executes callback suscribing to one or several events into a component
+ * Hook that executes a callback suscribing to one or several events into a component
  * ```tsx
  * const Example = () => {
     const { addEventListenner, removeEventListenner, listen } = useEventHandler<"change", string>();

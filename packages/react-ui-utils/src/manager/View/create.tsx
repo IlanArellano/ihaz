@@ -29,12 +29,43 @@ export interface ViewMethods {
 export type IViewManager = Omit<ViewUncontrolledComp, "Component"> &
   ViewMethods;
 
-/**Metodo que genera un compomponente que sirve para renderizar un arreglo de componentes dentro de su propio estado
- * el componente llama al metodo asincrono @see `show` para agregar un nuevo objeto que recive como parametros el
- * componente jsx que va a renderizar como componente, y las props que recibe el componente, cada metodo hereda
- * una propiedad @see `onClose` que al llamarse elimina el componente del estado devolviendo un resultado
- */
+/**An enviroment that handle uncontrolled component views in `React` */
 export namespace ViewManager {
+  /**Create a view manager that can handle the mount-unmount behavior from the own parent `Tree` component
+   * through the `show` and `onClose` methods. Every component is added
+   * to internal Parent component state, components inherit a prop called `onClose` when
+   * the method is called it will remove from the internal state, the method can also
+   * return a result when the component is closed
+   *
+   * ```tsx
+   * const manager = ViewManager.createViewManager();
+
+const ViewComponent = ({ onClose }: ViewProps<string>) => {
+  return (
+    <div>
+      <h1>View example</h1>
+      <button onClick={() => onClose("hello")}>Close</button>
+    </div>
+  );
+};
+
+const Example = () => {
+  const onShow = async () => {
+    const response = await manager.show(ViewComponent);
+    console.log(response); // Hello
+  };
+
+  return (
+    <div>
+      <button onClick={onShow}>Show</button>
+      <manager.Component />
+    </div>
+  );
+};
+
+   * 
+   * ```
+   */
   export const createViewManager = (): IViewManager => {
     const Tree = new ViewTree();
 

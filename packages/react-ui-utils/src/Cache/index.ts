@@ -1,4 +1,5 @@
 import {
+  AppCacheAction,
   CacheConfig,
   CacheState,
   NamedResource,
@@ -35,13 +36,16 @@ export namespace CacheResource {
 
   const generateKey = () => `${CACHE_KEY}${CACHE_INDEX++}`;
 
+  const CACHE_CLEAR: AppCacheAction = {
+    type: "clearRec",
+    payload: { resource: "" },
+  };
+
+  /**Clear all Cache by the key of any `Resource Managers` created by `createCacheResources` method */
   export const clearCacheByResource = (key: string) => {
     const findManager = managers.find((x) => x.key === key);
     if (!findManager) return;
-    findManager.manager.dispatch({
-      type: "clearRec",
-      payload: { resource: "" },
-    });
+    findManager.manager.dispatch(CACHE_CLEAR);
   };
 
   /**Creates a enviroment that can set a method's collection */
@@ -54,20 +58,22 @@ export namespace CacheResource {
       manager: cacheManager,
     });
 
+    const internalClearCache = () => {
+      cacheManager.dispatch(CACHE_CLEAR);
+    };
+
     return {
       createCache: addCacheResource(cacheManager),
       key,
       getCacheStore: cacheManager.getStore.bind(cacheManager),
-      clearCache: () => clearCacheByResource(key),
+      clearCache: internalClearCache,
     };
   };
 
+  /**Remove the Cache for all the store from `Resource Managers` created */
   export const clearAllCache = () => {
     managers.forEach((x) => {
-      x.manager.dispatch({
-        type: "clearRec",
-        payload: { resource: "" },
-      });
+      x.manager.dispatch(CACHE_CLEAR);
     });
   };
 }

@@ -2,7 +2,7 @@ import { DependencyList, EffectCallback, useLayoutEffect } from "react";
 
 type EffectResult = void | EffectCallback;
 
-/**Effect with same function that `React.useLayoutEffect` that can be declared a promise in the callback
+/**Effect with same function as `React.useLayoutEffect` that can be declared a promise in the callback
  * 
  * ```tsx
  * const Example = () => {
