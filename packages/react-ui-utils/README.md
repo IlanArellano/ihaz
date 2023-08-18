@@ -2,6 +2,16 @@
 
 A general UI common methods for general React Projects including React Dom and React Native.
 
+## Quick Start
+
+This library is made for every `React` project (React DOM and React Native) means the library has no more dependencies than React Core or any Third Party Dependencies made for single `React` Project.
+
+## Advantages
+
+- Library 100% React Core made only.
+- Provides common `Utilities` that resolve common `React` Project uses.
+- Easy user interface implementations.
+
 ## Documentation
 
 This library provides the following utilities:
@@ -29,7 +39,7 @@ This library provides the following utilities:
 
 ## CacheResource
 
-Cache Resource is a general cache manager can store a function result from a resource collection
+Cache Resource is a general cache manager can store a function result from a resource collection.
 
 **Import**
 
@@ -40,6 +50,10 @@ import { CacheResource } from "@ihaz/react-ui-utils";
 ### createCacheResources
 
 Method that create a resource collection of methods that the result will be stored in cache, the cache will be cleared when the argument values changes.
+
+**Explanation**
+
+Working
 
 **Example**
 
@@ -94,7 +108,7 @@ const manager = CacheResource.createCacheResources();
 CacheResource.clearCacheByResource(manager.key);
 ```
 
-Alternatively you can use the private cache Method `clearCache` from a Cache Resources:
+Alternatively you can use the private cache Method `clearCache` from any Cache Resources:
 
 ```ts
 import { CacheResource } from "@ihaz/react-ui-utils";
@@ -118,7 +132,7 @@ CacheResource.clearAllCache();
 
 ## ViewManager
 
-An enviroment that handle uncontrolled component views in `React`.
+An `View` collection enviroment that handle uncontrolled component views in `React`.
 
 **Import**
 
@@ -128,7 +142,7 @@ import { ViewManager } from "@ihaz/react-ui-utils";
 
 ### createViewManager
 
-Create a view manager that can handle the mount-unmount behavior from the own parent `Tree` component through the `show` and `onClose` methods. Every component is added to internal Parent component state, components inherit a prop called `onClose` when the method is called it will remove from the internal state, the method can also return a result when the component is closed
+Create a view manager that can handle the mount-unmount behavior from the own parent `Tree` component through the `show` and `onClose` methods. Every component is added to internal Parent component state, components inherit a prop called `onClose` when the method is called it will remove from the internal state, the method can also return a result when the component is closed.
 
 **Example**
 
@@ -160,6 +174,21 @@ const Example = () => {
   );
 };
 ```
+
+**Methods**
+
+**_show_**
+
+Mount the passing instance Component adding it to parent `Tree` collection. Every Child Component inherits a `onClose` method that unmount and remove of the parent `Tree` collection and return a result in his argument, when it´s called a promise is resolved and return the result setted.
+
+**_showSync_**
+Method with same effect as `show` method, the child component is mount in parent `Tree` collection and inherits a `onClose` method. this function return the following methods.
+
+- show: Mount the child component
+
+- close: Unmount the child component, if `onClose` method from child component is called previously, this one has no effect.
+
+If any result is declared in `onClose` argument, it will be show in `onCloseListenner` callback
 
 ## Components
 
@@ -320,13 +349,15 @@ const Example = () => {
 ```tsx
 const [count, setCount] = useState(0);
 
+// Wrong ❌
 useIntervalEffect(() => {
-  console.log(count); // Wrong ❌
+  console.log(count);
 }, 1000);
 
+// Good ✅
 useIntervalEffect(
   ({ countDependency }) => {
-    console.log(countDependency); // Good ✅
+    console.log(countDependency);
   },
   1000,
   { countDependency: count }
@@ -362,7 +393,7 @@ const Example = () => {
 
 **Caveats**
 
-- _useValueHandler_ is a hook that store a value by ref, so this hook never update de component.
+- _useValueHandler_ is a hook that store a value by ref, so this hook never update the component.
 - For callbacks and effects that use the value stored always return the current value, in case if the callback value is called in jsx, it must have a trigger or state that update the component for show the current value.
 - The value (similar to `React State` conditions) returns a read-only and non-mutable value that can be only change by the dispatch method, so don´t change or mutate the value directly.
 

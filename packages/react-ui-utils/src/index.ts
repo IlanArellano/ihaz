@@ -3,6 +3,7 @@ import {
   useIntervalEffect,
   useEventHandler,
   useValueHandler,
+  useLayoutEffectAsync,
 } from "./hooks";
 import { ViewManager } from "./manager";
 import { createFormManager } from "./components";
@@ -17,5 +18,6 @@ export {
   useIntervalEffect,
   useEventHandler,
   useValueHandler,
+  useLayoutEffectAsync,
   CacheResource,
 };
