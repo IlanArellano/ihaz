@@ -29,7 +29,7 @@ This library provides the following utilities:
 - Hooks
   - [useEffectAsync](#useeffectasync)
   - [useLayoutEffectAsync](#uselayouteffectasync)
-  - [useEffectInterval](#useeffectinterval)
+  - [useIntervalEffect](#useintervaleffect)
   - [useValueHandler](#usevaluehandler)
   - [useEventHandler](#useeventhandler)
 - Other Utilities
@@ -144,7 +144,7 @@ import { ViewManager } from "@ihaz/react-ui-utils";
 
 Create a view manager that can handle the mount-unmount behavior from the own parent `Tree` component through the `show` and `onClose` methods. Every component is added to internal Parent component state, components inherit a prop called `onClose` when the method is called it will remove from the internal state, the method can also return a result when the component is closed.
 
-**Example**
+**Usage**
 
 ```tsx
 import { ViewManager } from "@ihaz/react-ui-utils";
@@ -181,6 +181,53 @@ const Example = () => {
 
 Mount the passing instance Component adding it to parent `Tree` collection. Every Child Component inherits a `onClose` method that unmount and remove of the parent `Tree` collection and return a result in his argument, when it´s called a promise is resolved and return the result setted.
 
+**Example**
+
+```tsx
+import { ViewManager, type ViewProps } from "@ihaz/react-ui-utils";
+
+const manager = ViewManager.createViewManager();
+
+function BasicDemo({ onClose }: ViewProps<boolean>) {
+  return (
+    <Dialog
+      header="Header"
+      visible
+      style={{ width: "50vw" }}
+      onHide={() => onClose(false)}
+    >
+      <Button
+        label="True Response"
+        icon="pi pi-external-link"
+        onClick={() => onClose(true)}
+      />
+      <Button
+        label="False Response"
+        icon="pi pi-external-link"
+        onClick={() => onClose(false)}
+      />
+      <p className="m-0">Lorem ipsum ...</p>
+    </Dialog>
+  );
+}
+
+function App() {
+  const onShow = async () => {
+    const response = await manager.show(BasicDemo); //Promise will be resolved when `onClose` method is called and return a result if is declared
+    console.log(response);
+  };
+
+  return (
+    <main>
+      {/*Component must be included in any part of your React Project for declare its own instance*/}
+      <manager.Component /> <button onClick={onShow}>Show Dialog</button>
+    </main>
+  );
+}
+
+export default App;
+```
+
 **_showSync_**
 Method with same effect as `show` method, the child component is mount in parent `Tree` collection and inherits a `onClose` method. this function return the following methods.
 
@@ -188,7 +235,194 @@ Method with same effect as `show` method, the child component is mount in parent
 
 - close: Unmount the child component, if `onClose` method from child component is called previously, this one has no effect.
 
-If any result is declared in `onClose` argument, it will be show in `onCloseListenner` callback
+If any result is declared in `onClose` argument, it will be show in `onCloseListenner` callback.
+
+**Example**
+
+```tsx
+import { ViewManager, type ViewProps } from "@ihaz/react-ui-utils";
+
+const manager = ViewManager.createViewManager();
+
+function BasicDemo({ onClose }: ViewProps<boolean>) {
+  return (
+    <Dialog
+      header="Header"
+      visible
+      style={{ width: "50vw" }}
+      onHide={() => onClose(false)}
+    >
+      <Button
+        label="True Response"
+        icon="pi pi-external-link"
+        onClick={() => onClose(true)}
+      />
+      <Button
+        label="False Response"
+        icon="pi pi-external-link"
+        onClick={() => onClose(false)}
+      />
+      <p className="m-0">Lorem ipsum ...</p>
+    </Dialog>
+  );
+}
+
+function App() {
+  const onCloseListenner = (value: boolean) => {
+    console.log({ value }); // Return the value
+  };
+
+  const onShow = () => {
+    const dialog = manager.showSync(BasicDemo, undefined, onCloseListenner); // onCloseListenner callback is called when onClose method is called inside component
+    dialog.start(); // Mount Component
+  };
+
+  return (
+    <main>
+      {/*Component must be included in any part of your React Project for declare its own instance*/}
+      <manager.Component />
+      <button onClick={onShow}>Show Dialog</button>
+    </main>
+  );
+}
+
+export default App;
+```
+
+**Merge Props**
+You can merge props of the child component its depends the own component lifecycle.
+
+**Example**
+
+```tsx
+import { ViewManager, type ViewProps } from "@ihaz/react-ui-utils";
+
+const manager = ViewManager.createViewManager();
+
+interface BasicDemoProps extends ViewProps<boolean> {
+  name: string;
+}
+
+function BasicDemo({ onClose, name }: BasicDemoProps) {
+  return (
+    <Dialog
+      header="Header"
+      visible
+      style={{ width: "50vw" }}
+      onHide={() => onClose(false)}
+    >
+      <Button
+        label="True Response"
+        icon="pi pi-external-link"
+        onClick={() => onClose(true)}
+      />
+      <Button
+        label="False Response"
+        icon="pi pi-external-link"
+        onClick={() => onClose(false)}
+      />
+      <p className="m-0">{name}</p>
+    </Dialog>
+  );
+}
+
+function App() {
+  const onShow = async () => {
+    const res = await manager.show(BasicDemo, { name: "Hello" });
+    console.log({ res });
+  };
+
+  return (
+    <main>
+      <manager.Component />
+      <button onClick={onShow}>Show Dialog</button>
+    </main>
+  );
+}
+
+export default App;
+```
+
+**Context**
+View Child components works as stand alone component that it can render without depending if the parent component is mount or not in main `React Tree`, so the solution to unmount the view child component if the parent view is unmount if set a context to create a View Environment.
+
+**Example**
+
+```tsx
+import { ViewManager, type ViewProps } from "@ihaz/react-ui-utils";
+
+const manager = ViewManager.createViewManager();
+
+const CONTEXT = "render_view"; // Context to this View Environment, it works like a unique  key
+
+interface BasicDemoProps extends ViewProps<boolean> {
+  name: string;
+  setShowRender: Dispatch<SetStateAction<boolean>>;
+}
+
+function BasicDemo({ onClose, name, setShowRender }: BasicDemoProps) {
+  return (
+    <Dialog
+      header="Header"
+      visible
+      style={{ width: "50vw" }}
+      onHide={() => onClose(false)}
+    >
+      <Button
+        label="True Response"
+        icon="pi pi-external-link"
+        onClick={() => onClose(true)}
+      />
+      <Button
+        label="False Response"
+        icon="pi pi-external-link"
+        onClick={() => onClose(false)}
+      />
+      <Button
+        label="UnMount Parent Component"
+        icon="pi pi-external-link"
+        onClick={() => setShowRender(false)}
+      />
+      <p className="m-0">{name}</p>
+    </Dialog>
+  );
+}
+
+interface RenderViewComponentProps {
+  setShowRender: Dispatch<SetStateAction<boolean>>; //set a state dispatcher to unmount the parent component
+}
+
+function RenderViewComponent({ setShowRender }: RenderViewComponentProps) {
+  const onShow = async () => {
+    const res = await manager.show(
+      BasicDemo,
+      { name: "Hello", setShowRender },
+      CONTEXT // set the same context than parent component to bind the same view environment
+    );
+    console.log({ res });
+  };
+
+  return <button onClick={onShow}>Show Dialog</button>;
+}
+
+const RenderView = manager.createViewContextComponent(
+  RenderViewComponent,
+  CONTEXT
+); // HOC that register the parent component to internal Tree with a context key
+
+function App() {
+  const [showRender, setShowRender] = useState<boolean>(true);
+
+  return (
+    <main>
+      <manager.Component />
+      {showRender && <RenderView setShowRender={setShowRender} />} {/* When its unmount, view manager will remove all the child components with same context key, returning `undefined` value*/}
+    </main>
+  );
+}
+
+export default App;
+```
 
 ## Components
 
@@ -364,6 +598,10 @@ useIntervalEffect(
 );
 ```
 
+**Note**
+The interval effect dependency effect return the async previus value in every interval, so to a interval
+setted its get the current value that returns the dependency
+
 ### useValueHandler
 
 **Import**
@@ -372,7 +610,7 @@ useIntervalEffect(
 import { useValueHandler } from "@ihaz/react-ui-utils";
 ```
 
-Hook that provides an uncontrolled internal state storing the value with ref, meaning the value handler never affects the component lifecycle.
+Hook that provides an uncontrolled internal state storing the value with ref, meaning the value handler never affects the component lifecycle and always get the stored value synchronously.
 
 **Example**
 

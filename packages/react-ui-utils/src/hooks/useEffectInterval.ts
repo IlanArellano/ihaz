@@ -1,15 +1,13 @@
 import { IntervalHandler } from "@ihaz/js-ui-utils";
 import { EffectCallback, useEffect, useState } from "react";
 import useValueHandler from "./useValueHandler";
-
 type EffectResult = void | EffectCallback;
 
 interface IntervalEffectMethods {
-  /**Executes the interval again if it has been stopped before */
-  restart: () => void;
+  /**Executes the interval if it has been stopped before */
+  start: () => void;
   /**Stop the interval effect execution. When the method is called
-   * the current effect´s cleanup could be execute before the effect
-   * call the cleanup
+   * the current effect´s cleanup could be execute before the effect`s cleanup
    */
   stop: (executeCallbackCleanup?: boolean) => void;
 }
@@ -46,8 +44,9 @@ export default function useIntervalEffect<IDeps = {}>(
   inmediate = false
 ): IntervalEffectMethods {
   if (
-    intervalValues &&
-    (typeof intervalValues !== "object" || Array.isArray(intervalValues))
+    !intervalValues ||
+    typeof intervalValues !== "object" ||
+    Array.isArray(intervalValues)
   )
     throw new Error(
       `Inverval Effect dependencies expect an object but receive ${
@@ -55,38 +54,48 @@ export default function useIntervalEffect<IDeps = {}>(
       }`
     );
   const [refresh, setRefresh] = useState(false);
-  const [interval, setInterval] = useValueHandler<
+  const [interval, _setInterval] = useValueHandler<
     IntervalHandler | undefined
   >();
-  const [currEffectResCallback, setCurrEffectResCallback] = useValueHandler<
+  const [currEffectCallback, setCurrEffectCallback] = useValueHandler<
     EffectResult | undefined
+  >();
+  const [storedDependencies, setStoredDependencies] = useValueHandler<
+    IDeps | undefined
   >();
 
   const stop = (executeCallbackCleanup?: boolean) => {
     clear(executeCallbackCleanup);
   };
 
-  const restart = () => {
+  const start = () => {
     if (interval() !== undefined) return;
     setRefresh((prev) => !prev);
   };
 
   const clear = (executeCallbackCleanup?: boolean) => {
     const int = interval();
-    const effectRes = currEffectResCallback();
+    const effectRes = currEffectCallback();
+    if (!int && !effectRes) return;
     if (executeCallbackCleanup && effectRes && typeof effectRes === "function")
       effectRes();
     if (int) int.clear();
-    setInterval(undefined);
-    setCurrEffectResCallback(undefined);
+    _setInterval(undefined);
+    setCurrEffectCallback(undefined);
+    setStoredDependencies(undefined);
   };
 
   useEffect(() => {
-    setInterval(new IntervalHandler());
+    setStoredDependencies(intervalValues);
+  }, [intervalValues]);
+
+  useEffect(() => {
+    _setInterval(new IntervalHandler());
     const int = interval();
-    if (inmediate) setCurrEffectResCallback(effect(intervalValues as IDeps));
+    if (inmediate) setCurrEffectCallback(effect(storedDependencies()!));
+
     int!.set(() => {
-      setCurrEffectResCallback(effect(intervalValues as IDeps));
+      setCurrEffectCallback(effect(storedDependencies()!));
     }, ms);
     return () => {
       clear(true);
@@ -94,7 +103,7 @@ export default function useIntervalEffect<IDeps = {}>(
   }, [refresh]);
 
   return {
-    restart,
+    start,
     stop,
   };
 }

@@ -16,7 +16,11 @@ export class EventHandler<IValue = any> {
 
   isAnyEventSuscribed = () => !!this.list.length;
 
-  isSuscribed = (id: string) => this.list.some((evt) => evt.id === id);
+  isSuscribed = (id: string, callback: Callback<IValue>) =>
+    this.list.some(
+      (evt) =>
+        evt.id === id && evt.callback?.toString() === callback?.toString()
+    );
 
   listen(id: string, value?: IValue) {
     if (!this.list.length) return;
@@ -24,10 +28,10 @@ export class EventHandler<IValue = any> {
   }
 
   private executeEvent(id: string, value?: IValue) {
-    this.list.forEach(x => {
-      if(x.id !== id) return;
-      if(x.callback) x.callback(value);
-    })
+    this.list.forEach((x) => {
+      if (x.id !== id) return;
+      if (x.callback) x.callback(value);
+    });
   }
 
   listenAll() {
@@ -36,7 +40,10 @@ export class EventHandler<IValue = any> {
   }
 
   clear(id: string, callback: Callback<IValue>) {
-    this.list = this.list.filter((evt) => evt.id !== id && evt.callback !== callback);
+    this.list = this.list.filter(
+      (evt) =>
+        evt.id !== id && evt.callback?.toString() === callback?.toString()
+    );
   }
 
   clearByEvent(id: string) {
@@ -46,5 +53,4 @@ export class EventHandler<IValue = any> {
   clearAll() {
     this.list = [];
   }
-
 }

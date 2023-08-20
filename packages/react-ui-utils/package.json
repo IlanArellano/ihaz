@@ -1,6 +1,6 @@
 {
   "name": "@ihaz/react-ui-utils",
-  "version": "1.2.0-beta",
+  "version": "1.2.1-beta",
   "description": "A general UI common methods for React Projects, supports React Dom and React Native.",
   "type": "module",
   "main": "lib/index.js",
@@ -31,6 +31,6 @@
     "react": ">=16"
   },
   "dependencies": {
-    "@ihaz/js-ui-utils": "^1.0.1-alpha"
+    "@ihaz/js-ui-utils": "^1.0.3-alpha"
   }
 }

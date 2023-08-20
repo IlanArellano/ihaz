@@ -1,7 +1,8 @@
 import React, { useEffect, ComponentType } from "react";
 import { ViewTree } from "./tree";
+import { _Object } from "@utils/types";
 
-export type TreeComponent = <T extends JSX.IntrinsicAttributes>(
+export type TreeComponent = <T extends _Object>(
   ComponentWithRef: ComponentType<T>,
   key: string
 ) => ComponentType<T>;

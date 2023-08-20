@@ -48,7 +48,7 @@ export default function useEventHandler<
 
   const addEventListenner = (event: IEvents, fn: (value: IValue) => void) => {
     const id = getId(event);
-    if (eventHandler.current?.isSuscribed(id)) return;
+    if (eventHandler.current?.isSuscribed(id, fn)) return;
     eventHandler.current?.suscribe(id, fn);
   };
 
