@@ -1,11 +1,7 @@
-import React, { useEffect, ComponentType } from "react";
+import React, { useEffect } from "react";
 import { ViewTree } from "./tree";
 import { _Object } from "@utils/types";
-
-export type TreeComponent = <T extends _Object>(
-  ComponentWithRef: ComponentType<T>,
-  key: string
-) => ComponentType<T>;
+import { TreeComponent } from "./types";
 
 /**Registra un componente dentro de una coleccion donde se controla es estado de dicho componente, asignandole a un EventHandler
  * donde se pueden suscribir varios eventos

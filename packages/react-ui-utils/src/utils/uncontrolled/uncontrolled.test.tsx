@@ -1,7 +1,7 @@
 import React, { PureComponent, ReactNode } from "react";
 import { render, screen } from "@testing-library/react";
 import "@testing-library/jest-dom";
-import createUncontrolledClassComponent from ".";
+import { createUncontrolledClassComponent } from ".";
 
 class ClassComponent extends PureComponent<{}, { counter: number }> {
   constructor(props: {}) {

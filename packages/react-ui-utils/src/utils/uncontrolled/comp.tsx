@@ -6,72 +6,21 @@ import React, {
 } from "react";
 import type {
   ComponentState,
-  ComponentType,
   Context,
-  StaticLifecycle,
-  ValidationMap,
-  WeakValidationMap,
   Reducer,
   PropsWithChildren,
-  Dispatch,
 } from "react";
 import { ParametersWithoutFistParam, _Object } from "@utils/types";
 import { CommonObject } from "@ihaz/js-ui-utils";
-
-interface CustomComponentClass<
-  IComponent extends ReactComponent,
-  P,
-  S = ComponentState
-> extends StaticLifecycle<P, S> {
-  new (props: P, context?: any): IComponent;
-  propTypes?: WeakValidationMap<P> | undefined;
-  contextType?: Context<any> | undefined;
-  contextTypes?: ValidationMap<any> | undefined;
-  childContextTypes?: ValidationMap<any> | undefined;
-  defaultProps?: Partial<P> | undefined;
-  displayName?: string | undefined;
-}
-
-type MethodsWithInstance<IComponent> = {
-  [key: string]: (instance: () => IComponent, ...agrs: any[]) => any;
-};
-type Methods<
-  IComponent,
-  IMethodInstance extends MethodsWithInstance<IComponent>
-> = {
-  [key in keyof IMethodInstance]: (
-    ...args: ParametersWithoutFistParam<IMethodInstance[key]>
-  ) => ReturnType<IMethodInstance[key]>;
-};
-
-export type UncontrolledComponent<P = {}> = {
-  Component: ComponentType<P>;
-  isInstanceMounted: () => boolean;
-  getStore: () => _Object | undefined;
-};
-
-type UncontolledContextAction = {
-  type: string;
-  payload: _Object;
-};
-
-export interface UncontrolledContextValue<
-  State = _Object,
-  Action = UncontolledContextAction
-> {
-  getStore: () => State | undefined;
-  dispatch: Dispatch<Action>;
-}
-
-export interface UncontrolledContext {
-  reducer: (state: _Object, action: UncontolledContextAction) => _Object;
-  initialValues: _Object;
-}
-
-interface Options {
-  strictMode: boolean;
-  contextOptions: UncontrolledContext;
-}
+import {
+  CustomComponentClass,
+  Methods,
+  MethodsWithInstance,
+  Options,
+  UncontolledContextAction,
+  UncontrolledComponent,
+  UncontrolledContextValue,
+} from "./types";
 
 const isClassComponent = (component: any) =>
   typeof component === "function" && !!component.prototype.isReactComponent;
@@ -126,7 +75,7 @@ const isClassComponent = (component: any) =>
 *}
 ```
  */
-export default function createUncontrolledClassComponent<
+export function createUncontrolledClassComponent<
   IComponent extends ReactComponent<P, S>,
   IMethods extends MethodsWithInstance<IComponent>,
   P = IComponent extends ReactComponent<infer IProps> ? IProps : {},

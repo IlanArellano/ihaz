@@ -1,10 +1,6 @@
 import { useCallback, useImperativeHandle, useMemo, useRef } from "react";
-import {
-  Value,
-  ValueHandlerResult,
-  ValueSetter,
-} from "@utils/types/ValueHandler";
 import { Execute, ValueHandler } from "@ihaz/js-ui-utils";
+import { Value, ValueHandlerResult, ValueSetter } from "./types";
 
 const init = <IValue>(initial?: IValue) =>
   new ValueHandler(initial) as ValueHandler<IValue>;
@@ -42,22 +38,18 @@ export default function useValueHandler<IValue>(
     []
   );
 
-  const get = useCallback(() => {
-    const curr = value.current?.get() as IValue;
+  const getCurrValue = () =>
+    value.current
+      ? (value.current?.get() as IValue)
+      : (initialResolved as IValue);
 
-    return value.current && curr ? curr : (initialResolved as IValue);
-  }, []);
+  const get = useCallback(getCurrValue, []);
 
   const set = useCallback(
     (newValue: ValueSetter<IValue>, cb?: (value: IValue) => void) => {
-      if (!value.current) return;
-      const curr = value.current.get() as IValue;
-      const final = Execute.executeReturnedValue(
-        newValue,
-        value.current && curr ? curr : (initialResolved as IValue)
-      );
-      value.current.set(final);
-      if (cb) cb(final);
+      const final = Execute.executeReturnedValue(newValue, getCurrValue());
+      value.current?.set(final);
+      if (value.current && cb) cb(final);
     },
     []
   );

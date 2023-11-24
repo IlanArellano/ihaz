@@ -1,61 +1,16 @@
 import { Stack } from "@ihaz/js-ui-utils";
 import React, { PureComponent } from "react";
-import {
-  type ViewComponentProps,
-  type Entry,
-  type ViewProps,
-  ViewMainComponent,
-} from "./comp";
-import { EventHandlerRegister, VIEW_TREE_EVENT, ViewTree } from "./tree";
-export interface ShowFunc {
-  <TResult>(
-    render: React.ComponentType<ViewProps<TResult>>,
-    props?: {},
-    context?: string
-  ): Promise<TResult>;
-  <TProps>(
-    render: React.ComponentType<TProps>,
-    props?: Omit<TProps, keyof ViewProps<any>>,
-    context?: string
-  ): Promise<TProps extends ViewProps<infer TResult> ? TResult : unknown>;
-}
-
-export interface ViewSyncStartOptions {
-  delay: number;
-}
-
-export interface ViewSyncResult {
-  start: (options?: Partial<ViewSyncStartOptions>) => void;
-  /**Cierra el modal instanciado, devolviendo el resultado que previamente
-   * fue seteado con la llamada @see `onClose` en caso de no ser llamado
-   * devolvera undefined, si el modal fue previamente cerrado la funcion no
-   * tendrá efecto
-   */
-  close: () => void;
-}
-
-export interface ShowFuncSync {
-  <TResult>(
-    render: React.ComponentType<ViewProps<TResult>>,
-    props?: {},
-    onCloseListenner?: (res: TResult) => void,
-    context?: string
-  ): ViewSyncResult;
-  <TProps>(
-    render: React.ComponentType<TProps>,
-    props?: Omit<TProps, keyof ViewProps<any>>,
-    onCloseListenner?: (
-      res: TProps extends ViewProps<infer IResult> ? IResult : unknown
-    ) => void,
-    context?: string
-  ): ViewSyncResult;
-}
-
-export type ConditionView = (x: Entry) => boolean;
-
-export interface ViewManagerComponentProps {
-  Tree: ViewTree;
-}
+import { ViewMainComponent } from "./comp";
+import { VIEW_TREE_EVENT } from "./tree";
+import type {
+  ConditionView,
+  Entry,
+  EventHandlerRegister,
+  ShowFunc,
+  ShowFuncSync,
+  ViewComponentProps,
+  ViewManagerComponentProps,
+} from "./types";
 
 export class ViewManagerComponent extends PureComponent<
   ViewManagerComponentProps,
@@ -69,17 +24,13 @@ export class ViewManagerComponent extends PureComponent<
     };
   }
 
-  show = (
-    render: React.ComponentType<ViewProps>,
-    props: {},
-    context?: string
-  ): PromiseLike<any> => {
+  show: ShowFunc = (render, props, context) => {
     return new Promise((resolve) => {
       const currId = this.state.nextId;
 
       const entry: Entry = {
         id: currId,
-        render: render,
+        render,
         props: {
           onClose: (result: any) => {
             this.handleClose(currId, resolve)(result);
@@ -99,17 +50,12 @@ export class ViewManagerComponent extends PureComponent<
     });
   };
 
-  showSync = (
-    render: React.ComponentType<ViewProps>,
-    props: {},
-    onCloseListenner?: (res: any) => void,
-    context?: string
-  ): ViewSyncResult => {
+  showSync: ShowFuncSync = (render, props, onCloseListenner, context) => {
     const currId = this.state.nextId;
 
     const entry: Entry = {
       id: currId,
-      render: render,
+      render,
       props: {
         ...(props || {}),
         onClose: (res) => {
@@ -121,7 +67,7 @@ export class ViewManagerComponent extends PureComponent<
           ) {
             handler.event.clearByEvent(VIEW_TREE_EVENT);
           }
-          if (onCloseListenner) onCloseListenner(res);
+          if (onCloseListenner) onCloseListenner(res as never);
         },
       },
     };
@@ -135,7 +81,7 @@ export class ViewManagerComponent extends PureComponent<
       },
       close: () => {
         this.handleCloseSync(entry.id);
-        if (onCloseListenner) onCloseListenner(undefined);
+        if (onCloseListenner) onCloseListenner(undefined as never);
       },
     };
   };

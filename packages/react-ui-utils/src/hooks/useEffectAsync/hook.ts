@@ -1,6 +1,6 @@
-import { DependencyList, EffectCallback, useEffect } from "react";
-
-type EffectResult = void | EffectCallback;
+import { DependencyList, useEffect } from "react";
+import { EffectResult } from "@utils/types";
+import { createAsyncEffect } from "../shared/effect";
 
 /**Effect  with same function as `React.useEffect` that can be declared a promise in the callback
  * 
@@ -19,13 +19,7 @@ type EffectResult = void | EffectCallback;
  */
 export default function useEffectAsync(
   effect: () => Promise<EffectResult>,
-  deps: DependencyList
+  deps?: DependencyList
 ) {
-  useEffect(() => {
-    let res: EffectResult | null = null;
-    effect().then((result) => (res = result));
-    return () => {
-      if (res && typeof res === "function") res();
-    };
-  }, deps);
+  useEffect(createAsyncEffect(effect), deps);
 }

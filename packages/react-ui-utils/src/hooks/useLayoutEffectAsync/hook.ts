@@ -1,6 +1,6 @@
-import { DependencyList, EffectCallback, useLayoutEffect } from "react";
-
-type EffectResult = void | EffectCallback;
+import { DependencyList, useLayoutEffect } from "react";
+import type { EffectResult } from "@utils/types";
+import { createAsyncEffect } from "../shared/effect";
 
 /**Effect with same function as `React.useLayoutEffect` that can be declared a promise in the callback
  * 
@@ -21,11 +21,5 @@ export default function useLayoutEffectAsync(
   effect: () => Promise<EffectResult>,
   deps: DependencyList
 ) {
-  useLayoutEffect(() => {
-    let res: EffectResult | null = null;
-    effect().then((result) => (res = result));
-    return () => {
-      if (res && typeof res === "function") res();
-    };
-  }, deps);
+  useLayoutEffect(createAsyncEffect(effect), deps);
 }
