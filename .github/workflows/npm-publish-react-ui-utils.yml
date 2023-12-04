@@ -1,4 +1,4 @@
-name: Node.js Publish Packages
+name: Node.js Publish React UI Utils
 
 on:
   release:
@@ -12,7 +12,7 @@ jobs:
       - uses: actions/setup-node@v3
         with:
           node-version: 16
-      - run: cd packages/react-ui-uttils
+      - run: cd packages/react-ui-utils
       - run: npm ci
 
   publish-package:
@@ -26,8 +26,8 @@ jobs:
       - uses: actions/setup-node@v3
         with:
           node-version: 16
-          registry-url: https://npm.pkg.github.com/
-      - run: cd packages/react-ui-uttils
+          registry-url: https://registry.npmjs.org/
+      - run: cd packages/react-ui-utils
       - run: npm ci
       - run: npm run build
       - run: npm publish
