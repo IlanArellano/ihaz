@@ -19,9 +19,9 @@ jobs:
           node-version: 16
           registry-url: https://registry.npmjs.org/
       - name: Install NPM Packages
-      - run: npm ci
+        run: npm ci
       - name: Build and Publish
-      - run: |
+        run: |
           cd packages/js-ui-utils
           npm run build
           npm publish --access public
