@@ -1,8 +1,10 @@
 name: Node.js Publish React UI Utils
 
 on:
-  release:
-    types: [created]
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
 
 jobs:
   publish-package:
@@ -16,9 +18,12 @@ jobs:
         with:
           node-version: 16
           registry-url: https://registry.npmjs.org/
-      - run: npm ci
-      - run: cd packages/react-ui-utils 
-      - run: npm run build
-      - run: npm publish
+      - name: Install NPM Packages
+        run: npm ci
+      - name: Build and Publish
+        run: |
+          cd packages/react-ui-utils
+          npm run build
+          npm publish --access public
         env:
           NODE_AUTH_TOKEN: ${{secrets.NPM_AUTH_TOKEN}}
