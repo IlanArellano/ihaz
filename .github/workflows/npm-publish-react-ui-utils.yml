@@ -23,6 +23,7 @@ jobs:
       - name: Build and Publish
         run: |
           cd packages/react-ui-utils
+          npm ci
           npm run build
           npm publish --access public
         env:
