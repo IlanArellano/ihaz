@@ -20,11 +20,11 @@ jobs:
           registry-url: https://registry.npmjs.org/
       - name: Install NPM Packages
         run: npm ci
-      - name: Build and Publish
+      - name: Build all packages
+        run: npm run build
+      - name: Publish
         run: |
           cd packages/react-ui-utils
-          npm ci
-          npm run build
           npm publish --access public
         env:
           NODE_AUTH_TOKEN: ${{secrets.NPM_AUTH_TOKEN}}
