@@ -1,9 +1,17 @@
-import React, { FormHTMLAttributes, InputHTMLAttributes } from "react";
+import React, {
+  type FormHTMLAttributes,
+  forwardRef,
+  type InputHTMLAttributes,
+} from "react";
 
-export const Form = (props: FormHTMLAttributes<HTMLFormElement>) => {
-  return <form {...props} />;
-};
+export const Form = forwardRef<
+  HTMLFormElement,
+  FormHTMLAttributes<HTMLFormElement>
+>((props, ref) => {
+  return <form {...props} ref={ref} />;
+});
 
-export const Input = (props: InputHTMLAttributes<HTMLInputElement>) => (
-  <input {...props} />
-);
+export const Input = forwardRef<
+  HTMLInputElement,
+  InputHTMLAttributes<HTMLInputElement>
+>((props, ref) => <input {...props} ref={ref} />);

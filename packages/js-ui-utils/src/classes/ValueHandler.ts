@@ -1,7 +1,7 @@
 import { CommonObject } from "@utils/namespaces";
 
 export abstract class BaseHandler<T> {
-  abstract value: T;
+  protected abstract value: T;
 
   getDeepCopy() {
     return CommonObject.DeepCopy(this.value);
@@ -9,7 +9,7 @@ export abstract class BaseHandler<T> {
 }
 
 export class ValueHandler<T> extends BaseHandler<T> {
-  value: T;
+  protected value: T;
 
   constructor(initial: T) {
     super();

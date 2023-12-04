@@ -1,3 +1,26 @@
+import CacheManager from "./cacheManager";
+
+export type CacheResourceFuncWithInstance = <
+  T extends Resource<string>,
+  TName extends string
+>(
+  name: TName,
+  resource: T,
+  resourceConf: CacheConfig<Extract<keyof T, string>>
+) => NamedResource<T, TName>;
+
+export interface ICacheResourceUncontrolled {
+  key: string;
+  createCache: CacheResourceFuncWithInstance;
+  getCacheStore: () => CacheState;
+  clearCache: () => void;
+}
+
+export interface CacheManagers {
+  key: string;
+  manager: CacheManager;
+}
+
 export type CacheActions = "cache" | "clear";
 
 export type JSONValue =

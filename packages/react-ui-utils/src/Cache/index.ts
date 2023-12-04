@@ -1,33 +1,10 @@
-import {
-  AppCacheAction,
-  CacheConfig,
-  CacheState,
-  NamedResource,
-  Resource,
-} from "@utils/types/Cache";
 import CacheManager from "./cacheManager";
 import { addCacheResource } from "./logic";
-
-type CacheResourceFuncWithInstance = <
-  T extends Resource<string>,
-  TName extends string
->(
-  name: TName,
-  resource: T,
-  resourceConf: CacheConfig<Extract<keyof T, string>>
-) => NamedResource<T, TName>;
-
-interface ICacheResourceUncontrolled {
-  key: string;
-  createCache: CacheResourceFuncWithInstance;
-  getCacheStore: () => CacheState;
-  clearCache: () => void;
-}
-
-interface CacheManagers {
-  key: string;
-  manager: CacheManager;
-}
+import type {
+  AppCacheAction,
+  CacheManagers,
+  ICacheResourceUncontrolled,
+} from "./types";
 
 export namespace CacheResource {
   const CACHE_KEY = "_cache_manager_";

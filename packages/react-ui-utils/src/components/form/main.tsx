@@ -1,88 +1,27 @@
 import React, {
   createContext,
+  createRef,
+  forwardRef,
   PropsWithChildren,
   PureComponent,
-  ReactNode,
+  RefObject,
   useContext,
   useEffect,
   useMemo,
   useState,
 } from "react";
 import { CommonObject, EventHandler, ValueHandler } from "@ihaz/js-ui-utils";
-import { ItemManager } from "@utils/types/validation";
 import { ControlForm, ControlView } from "./controlView";
-
-type ValidationPredicate<IValue> = (value: IValue) => boolean;
-
-export type Validation<T> = {
-  [K in keyof T]?: T[K] extends object
-    ? Validation<T>
-    : ValidationPredicate<T[K]>;
-};
-
-interface FormValueState<T> {
-  value: T | undefined;
-  isValidated: ValidationResolve<T>;
-}
-
-interface FormValueStateResolved<T> {
-  /**Returns the current value from the internal form state */
-  value: T | undefined;
-  /**Returns the current status from the internal form validation if `validate` params is declare */
-  isValidated: boolean | undefined;
-}
-
-export type ValidationResolve<T> = {
-  [K in keyof T]?: T[K] extends object ? ValidationResolve<T> : boolean;
-};
-
-interface FormContext<T = any> {
-  value: T | undefined;
-  validation?: Validation<T>;
-  validationResolved: ValidationResolve<T>;
-  onChange:
-    | (<Key extends keyof T>(field: Key, value: T[Key]) => void)
-    | undefined;
-  itemManager: ItemManager<FormValueState<T>, "change">;
-}
-
-export type FormProps<T, TProps extends { [k: string]: any }> = {
-  render?: React.ComponentType<TProps>;
-  ref?: React.Ref<any>;
-  onSubmit?: (result: T) => void;
-  children?: ReactNode;
-} & (Partial<Pick<TProps, "value">> &
-  Pick<TProps, Exclude<keyof TProps, "value" | "onChange" | "onSubmit">> & {
-    onChange?: TProps["onChange"] | null;
-  });
-
-export type FieldProps<TProps extends { [k: string]: any }, T> = {
-  render?: React.ComponentType<TProps>;
-  field: keyof T;
-  ref?: React.Ref<any>;
-} & (Partial<Pick<TProps, "value">> &
-  Pick<TProps, Exclude<keyof TProps, "value" | "onChange">> & {
-    onChange?: TProps["onChange"] | null;
-  });
-
-export interface FormManager<T> {
-  Form: <
-    TProps extends {
-      [k: string]: any;
-    } = React.InputHTMLAttributes<HTMLInputElement>
-  >(
-    props: FormProps<T, TProps>
-  ) => React.JSX.Element;
-  Field: <
-    TProps extends {
-      [k: string]: any;
-    } = React.InputHTMLAttributes<HTMLInputElement>
-  >(
-    props: FieldProps<TProps, T>
-  ) => React.JSX.Element;
-  Submit: ({ children }: PropsWithChildren) => React.JSX.Element | null;
-  useFormValue: () => FormValueStateResolved<T>;
-}
+import {
+  FieldProps,
+  FormContext,
+  FormManager,
+  FormProps,
+  FormValueState,
+  FormValueStateResolved,
+  Validation,
+  ValidationResolve,
+} from "./types";
 
 const EvalValidation = <T, Key extends keyof T>(
   value: T[Key],
@@ -196,6 +135,7 @@ export function createFormManager<T extends { [key: string]: any }>(
     FormProps<T, TProps>,
     { value: T; validationResolved: ValidationResolve<T> }
   > {
+    private formRef: RefObject<T>;
     constructor(props: FormProps<T, TProps>) {
       super(props);
       this.state = {
@@ -204,6 +144,7 @@ export function createFormManager<T extends { [key: string]: any }>(
           ? CommonObject.ChangeValueFromObject(validation as T, false, true)
           : {},
       };
+      this.formRef = createRef();
     }
 
     handleChange = <Key extends keyof T>(field: Key, value: T[Key]) => {
@@ -232,6 +173,10 @@ export function createFormManager<T extends { [key: string]: any }>(
       if (this.props.onSubmit) this.props.onSubmit(this.state.value);
     };
 
+    getFormRef = () => {
+      return this.formRef;
+    };
+
     render() {
       const { value, validationResolved } = this.state;
       return (
@@ -247,6 +192,7 @@ export function createFormManager<T extends { [key: string]: any }>(
             {...this.props}
             value={value}
             onSubmit={this.handleSubmit.bind(this)}
+            ref={this.formRef}
           />
         </FormCxt.Provider>
       );
@@ -261,16 +207,15 @@ export function createFormManager<T extends { [key: string]: any }>(
       [formCtx.validationResolved]
     );
 
-    if (!validation) return <>{children}</>;
     if (!_eval) return null;
     return <>{children}</>;
   }
 
-  function Field<
+  function FieldComp<
     TProps extends {
       [k: string]: any;
     } = React.InputHTMLAttributes<HTMLInputElement>
-  >(props: FieldProps<TProps, T>) {
+  >(props: FieldProps<TProps, T>, ref: React.ForwardedRef<any>) {
     const formctx = useContext(FormCxt);
 
     useEffect(() => {
@@ -308,9 +253,20 @@ export function createFormManager<T extends { [key: string]: any }>(
         value={formctx.value?.[props.field]}
         onChange={!isDisabled && handleChange}
         disabled={isDisabled}
+        ref={ref}
       />
     );
   }
+
+  const Field = forwardRef(
+    FieldComp as <
+      TProps extends {
+        [k: string]: any;
+      } = React.InputHTMLAttributes<HTMLInputElement>
+    >(
+      props: FieldProps<TProps, T>
+    ) => ReturnType<typeof FieldComp>
+  ) as FormManager<T>["Field"];
 
   function useFormValue() {
     const { value: FormValue, itemManager } = useContext(FormCxt);

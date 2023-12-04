@@ -1,33 +1,15 @@
-import React, { ComponentType } from "react";
-import {
+import React from "react";
+import { ViewManagerComponent } from "./manager";
+import { registerTreeComponent } from "./registerTreeComponent";
+import { ViewTree } from "./tree";
+import { createUncontrolledClassComponent } from "@utils/utils";
+import type {
+  ConditionView,
+  IViewManager,
   ShowFunc,
   ShowFuncSync,
-  ViewManagerComponent,
-  ConditionView,
-  ViewManagerComponentProps,
-} from "./manager";
-import { ViewProps } from "./comp";
-import { TreeComponent, registerTreeComponent } from "./registerTreeComponent";
-import { ViewTree } from "./tree";
-import createUncontrolledClassComponent, {
-  UncontrolledComponent,
-} from "@utils/utils/uncontrolled";
-
-export interface ViewUncontrolledComp
-  extends UncontrolledComponent<ViewManagerComponentProps> {
-  show: ShowFunc;
-  showSync: ShowFuncSync;
-  removeEntries: (condition?: ConditionView) => void;
-}
-
-export interface ViewMethods {
-  Component: ComponentType;
-  getTree: () => ViewTree;
-  createViewContextComponent: TreeComponent;
-}
-
-export type IViewManager = Omit<ViewUncontrolledComp, "Component"> &
-  ViewMethods;
+  ViewUncontrolledComp,
+} from "./types";
 
 /**An enviroment that handle uncontrolled component views in `React` */
 export namespace ViewManager {
@@ -69,35 +51,32 @@ const Example = () => {
   export const createViewManager = (): IViewManager => {
     const Tree = new ViewTree();
 
-    const manager: ViewUncontrolledComp = createUncontrolledClassComponent(
-      ViewManagerComponent,
-      {
-        show: (
-          instance,
-          render: React.ComponentType<ViewProps>,
-          props?: any,
-          context?: string
-        ) => {
-          return new Promise((resolve) => {
-            instance()
-              .show(render, props, context)
-              .then((x) => resolve(x));
-          });
-        },
-        showSync: (
-          instance,
-          render: React.ComponentType<ViewProps>,
-          props?: any,
-          onCloseListenner?: any,
-          context?: string
-        ) => {
-          return instance().showSync(render, props, onCloseListenner, context);
-        },
-        removeEntries: (instance, condition?: ConditionView) => {
-          instance().removeSomeEntries(condition);
-        },
-      }
-    );
+    const manager = createUncontrolledClassComponent(ViewManagerComponent, {
+      show: (
+        instance: () => ViewManagerComponent,
+        render: Parameters<ShowFunc>[0],
+        props: Parameters<ShowFunc>[1],
+        context: Parameters<ShowFunc>[2]
+      ) => {
+        return new Promise((resolve) => {
+          instance()
+            .show(render, props, context)
+            .then((x) => resolve(x));
+        });
+      },
+      showSync: (
+        instance: () => ViewManagerComponent,
+        render: Parameters<ShowFuncSync>[0],
+        props: Parameters<ShowFuncSync>[1],
+        onCloseListenner: Parameters<ShowFuncSync>[2],
+        context: Parameters<ShowFuncSync>[3]
+      ) => {
+        return instance().showSync(render, props, onCloseListenner, context);
+      },
+      removeEntries: (instance, condition?: ConditionView) => {
+        instance().removeSomeEntries(condition);
+      },
+    }) as ViewUncontrolledComp;
 
     const getTree = () => Tree;
 

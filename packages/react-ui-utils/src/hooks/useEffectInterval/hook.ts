@@ -1,16 +1,8 @@
 import { IntervalHandler } from "@ihaz/js-ui-utils";
-import { EffectCallback, useEffect, useState } from "react";
-import useValueHandler from "./useValueHandler";
-type EffectResult = void | EffectCallback;
-
-interface IntervalEffectMethods {
-  /**Executes the interval if it has been stopped before */
-  start: () => void;
-  /**Stop the interval effect execution. When the method is called
-   * the current effect´s cleanup could be execute before the effect`s cleanup
-   */
-  stop: (executeCallbackCleanup?: boolean) => void;
-}
+import { EffectResult } from "@utils/types";
+import { useEffect, useState } from "react";
+import { IntervalEffectMethods } from "./types";
+import useValueHandler from "../useValueHandler";
 
 /**Hook that execute a callback into a Interval
  *

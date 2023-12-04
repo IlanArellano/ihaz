@@ -1,16 +1,5 @@
 import { EventHandler, ValueHandler } from "@ihaz/js-ui-utils";
-
-export type Status = "mounted" | "unmounted";
-
-export interface ComponentRegister {
-  key: string;
-  status: Status;
-}
-
-export interface EventHandlerRegister {
-  key: string;
-  event: EventHandler;
-}
+import type { ComponentRegister, EventHandlerRegister, Status } from "./types";
 
 export const VIEW_TREE_EVENT = "close";
 

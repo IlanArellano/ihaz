@@ -1,1 +1,1 @@
-export { ViewManager } from "./View";
+export * from "./View";

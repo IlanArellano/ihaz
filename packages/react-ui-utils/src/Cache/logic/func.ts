@@ -6,7 +6,7 @@ import {
   FunctionCache,
   FunctionCacheAction,
   JSONValue,
-} from "@utils/types/Cache";
+} from "../types";
 
 function syncCacheCall(
   cache: FunctionCache,

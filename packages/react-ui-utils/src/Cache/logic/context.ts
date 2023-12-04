@@ -8,7 +8,7 @@ import {
   FunctionCache,
   FunctionCacheAction,
   ResourceCacheAction,
-} from "@utils/types/Cache";
+} from "../types";
 
 export const EMPTY_FUNCTION_CACHE: FunctionCache = { entries: [] };
 

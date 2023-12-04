@@ -1,12 +1,12 @@
-import React, { forwardRef, useEffect, useMemo, useState } from "react";
+import React, { forwardRef, useMemo } from "react";
 import { CommonObject, Client } from "@ihaz/js-ui-utils";
 import { Form, Input } from "./FormComp";
-import type { FieldProps, FormProps } from "./index";
+import type { FieldProps, FormProps } from "./types";
 
 export const ControlView = forwardRef<
   any,
   FieldProps<{ [k: string]: any }, any>
->((props) => {
+>((props, ref) => {
   const Component = props.render;
   const CompProps = useMemo(
     () => CommonObject.Omit(props, "field", "render", "value", "onChange"),
@@ -21,10 +21,14 @@ export const ControlView = forwardRef<
 
   if (!Component) {
     if (!Client.isClientSide()) return null;
-    return <Input {...CompProps} value={value} onChange={handleChange} />;
+    return (
+      <Input {...CompProps} value={value} ref={ref} onChange={handleChange} />
+    );
   }
 
-  return <Component {...CompProps} value={value} onChange={handleChange} />;
+  return (
+    <Component {...CompProps} value={value} ref={ref} onChange={handleChange} />
+  );
 });
 
 export const ControlForm = forwardRef<
@@ -32,7 +36,6 @@ export const ControlForm = forwardRef<
   FormProps<any, { [k: string]: any }>
 >((props, ref) => {
   const Component = props.render;
-  const [update, setUpdate] = useState<boolean>(false);
   const CompProps = useMemo(
     () => CommonObject.Omit(props, "field", "render", "value", "onChange"),
     [props]
@@ -40,13 +43,8 @@ export const ControlForm = forwardRef<
 
   const isClient = useMemo(() => Client.isClientSide(), []);
 
-  useEffect(() => {
-    setUpdate(true);
-  }, []);
-
-  if (update === false) return null;
   if (!Component) {
-    if (isClient) return <Form {...CompProps} />;
+    if (isClient) return <Form {...CompProps} ref={ref} />;
     return <>{props.children}</>;
   }
   return <Component ref={ref} {...CompProps} />;

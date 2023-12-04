@@ -1,15 +1,8 @@
 import { EventHandler } from "@ihaz/js-ui-utils";
 import { useImperativeHandle, useRef } from "react";
+import { HandleEvents } from "./types";
 
 const getId = (event: string) => `_${event}`;
-
-export interface HandleEvents<IEvents, IValue> {
-  addEventListenner: (event: IEvents, fn: (value: IValue) => void) => void;
-  removeEventListenner: (event: IEvents, fn: (value: IValue) => void) => void;
-  listen: (event: IEvents, value: IValue) => void;
-  listenAll: () => void;
-  clearAll: () => void;
-}
 
 /**
  * Hook that executes a callback suscribing to one or several events into a component

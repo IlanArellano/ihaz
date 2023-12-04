@@ -1,1 +1,1 @@
-export { createFormManager } from "./form";
+export * from "./form";
