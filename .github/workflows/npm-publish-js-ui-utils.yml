@@ -18,6 +18,7 @@ jobs:
         with:
           node-version: 16
           registry-url: https://registry.npmjs.org/
+      - run: ls
       - run: npm ci
       - run: cd packages/js-ui-utils
       - run: npm run build
