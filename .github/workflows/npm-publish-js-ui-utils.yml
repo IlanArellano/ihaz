@@ -18,9 +18,12 @@ jobs:
         with:
           node-version: 16
           registry-url: https://registry.npmjs.org/
+      - name: Install NPM Packages
       - run: npm ci
-      - run: cd packages/js-ui-utils
-      - run: npm run build
-      - run: npm publish --access public
+      - name: Build and Publish
+      - run: |
+          cd packages/js-ui-utils
+          npm run build
+          npm publish --access public
         env:
           NODE_AUTH_TOKEN: ${{secrets.NPM_AUTH_TOKEN}}
