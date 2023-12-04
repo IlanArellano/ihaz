@@ -1,8 +1,10 @@
 name: Node.js JS UI Utils
 
 on:
-  release:
-    types: [created]
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
 
 jobs:
   publish-package:
