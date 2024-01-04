@@ -4,7 +4,6 @@ import { Client } from "./client";
 type MapObjectOut<T, TOut> = { [K in keyof T]: TOut };
 
 export namespace CommonObject {
-  /**Devuelve un objeto eliminando todas las keys seleccionadas */
   export const Omit = <T extends { [k: string]: any }, K extends keyof T>(
     obj: T,
     ...omits: K[]
@@ -13,6 +12,15 @@ export namespace CommonObject {
       const { [curr]: omitted, ...rest } = prev as T;
       return rest;
     }, obj as Omit<T, K>);
+
+  export const Pick = <T extends { [k: string]: any }, K extends keyof T>(
+    obj: T,
+    ...picks: K[]
+  ): Pick<T, K> =>
+    picks.reduce(
+      (prev, curr) => ({ ...prev, [curr]: obj[curr] }),
+      {} as Pick<T, K>
+    );
 
   export function mapObject<T, TOut>(
     obj: T,
