@@ -1,8 +1,8 @@
 import { CommonObject, Validation } from "@ihaz/js-ui-utils";
 import {
-  CacheConfig,
   CacheEntry,
   CachePayload,
+  CacheResourceConfig,
   FunctionCache,
   FunctionCacheAction,
   JSONValue,
@@ -13,11 +13,8 @@ function syncCacheCall(
   func: (...args: JSONValue[]) => CachePayload,
   args: JSONValue[]
 ): {
-  /**Resultado ya sea de la función o de la entrada existente del caché */
   result: CachePayload;
-  /**En caso de que el valor no existiera en el cache, es la entrada que hay que agregar al cache */
   newEntry: CacheEntry | undefined;
-  /**Indica si la función devolvió una promesa */
   async: boolean;
 } {
   const entry = cache.entries.find((entry) =>
@@ -37,7 +34,6 @@ function syncCacheCall(
         },
         id: (cache.entries[cache.entries.length - 1]?.id ?? 0) + 1,
       };
-  //El valor se encontró en el caché:
   return {
     result: value,
     newEntry: newEntry,
@@ -51,12 +47,10 @@ export function cacheCall<TFunc extends (...args: any[]) => any>(
   func: TFunc,
   args: JSONValue[],
   onClear: (() => void) | undefined,
-  config?: CacheConfig<string>
+  config?: CacheResourceConfig
 ): ReturnType<TFunc> {
-  //Leer el cache
   const result = syncCacheCall(cache, func, args);
 
-  //La entrada que se va a agregar al cache:
   let newEntry = result.newEntry;
 
   if (newEntry) {
@@ -64,23 +58,14 @@ export function cacheCall<TFunc extends (...args: any[]) => any>(
       type: "setEntry",
       payload: {
         entry: newEntry,
-        config: config || ({} as CacheConfig<string>),
+        config: config || ({} as CacheResourceConfig),
       },
     });
 
     if (Validation.isPromiseLike(result.result)) {
-      //Agrega la entrada al cache, note que no devolvemos la promesa resultante de la función,
-      //si no que agregamos la promesa generada por 'ret':
-      //Ruta asincrona para verificar que la promesa no devuelva una excepción:
       const ret = (async () => {
         try {
           const syncValue = (await result.result) as JSONValue;
-
-          //Establecer el cache con el valor síncrono
-
-          //NOTA: Es posible que en este punto la entrada del cache ya no exista, ya que existe un "await" entre el "setEntry" y el "resolvePromise",
-          //en ese inter se pudo haber llenado el cache y borrado ese elemento, en este caso el reduce ignora el resolvePromise ya que el resolvePromise funciona
-          //por "id", no por "args"
           dispatch({
             type: "resolvePromise",
             payload: {
@@ -91,7 +76,6 @@ export function cacheCall<TFunc extends (...args: any[]) => any>(
 
           return syncValue;
         } catch (error) {
-          //La promesa lanzó error, limpiamos el caché:
           dispatch({
             type: "error",
             payload: { error: error as Error },
@@ -99,14 +83,11 @@ export function cacheCall<TFunc extends (...args: any[]) => any>(
           throw error;
         } finally {
           if (result.newEntry) {
-            //Llamamos al onCall hasta que ya se resolvió la promesa
             if (onClear) onClear();
           }
         }
       })();
 
-      //Modificamos la entrada que se va a agregar al cache con la promesa ret:
-      //Es decir, no se develve la promesa tal cual que devolvió la función
       newEntry = {
         ...newEntry,
         value: {
@@ -115,7 +96,6 @@ export function cacheCall<TFunc extends (...args: any[]) => any>(
         },
       };
     } else {
-      //Llamamos al onCall justo después de llamar a la función sólo si el resultado es síncrono, si no, el onCall se llama hasta que se resuelve la promesa
       if (onClear) onClear();
     }
   }

@@ -3,6 +3,7 @@ import CacheManager from "../cacheManager";
 import {
   CacheConfig,
   CacheResource,
+  CacheResourceInternals,
   FunctionCacheAction,
   NamedResource,
   Resource,
@@ -31,26 +32,34 @@ function getFuncCacheDispatch<T>(
   };
 }
 
-export const addCacheResource =
-  (cacheManager: CacheManager) =>
+export const createCacheImpl =
+  (cacheManager: CacheManager, key: string) =>
   <T extends Resource<string>, TName extends string>(
     name: TName,
     resource: T,
     config: CacheConfig<Extract<keyof T, string>>
   ): NamedResource<T, TName> => {
-    const getResource = () => {
-      const state = cacheManager.getStore();
-      return state?.[name]?.cache || {};
+    const getResource: CacheResourceInternals<T>["getResource"] = () => {
+      return cacheManager.getCache(name);
     };
-    const dispatchResource = (ac: ResourceCacheAction<string>) => {
+
+    const clearResource: CacheResourceInternals<T>["clearResource"] = (
+      clean
+    ) => {
+      cacheManager.dispatch({
+        type: "clearRec",
+        payload: {
+          clean,
+          resource: name,
+        },
+      });
+    };
+
+    const dispatchResource = (
+      ac: ResourceCacheAction<Extract<keyof T, string>>
+    ) => {
       if (ac.type == "clear") {
-        cacheManager.dispatch({
-          type: "clearRec",
-          payload: {
-            clean: ac.payload.clean,
-            resource: name,
-          },
-        });
+        clearResource(ac.payload.clean);
         return;
       }
       cacheManager.dispatch({
@@ -62,6 +71,12 @@ export const addCacheResource =
       });
     };
 
+    if (config)
+      cacheManager.setResourceConfig(
+        name,
+        CommonObject.Pick(config, "externalStorage")
+      );
+
     const retResource = cacheResourceFuncs(
       getResource,
       dispatchResource,
@@ -72,6 +87,11 @@ export const addCacheResource =
     return {
       name,
       resources: retResource,
+      key,
+      _internals_: {
+        getResource,
+        clearResource,
+      },
     };
   };
 
@@ -85,7 +105,7 @@ export function cacheResourceFuncs<T extends Resource<string>>(
   const clearKeys = (resourceConf && resourceConf.clear) || [];
   const ret = CommonObject.mapObject(
     resource,
-    (value, key) =>
+    (func, key) =>
       (...args: any[]): any => {
         const usarCache = cacheKeys.some((x) => (x as string) === key);
         const clean = clearKeys.find((x) => {
@@ -113,13 +133,17 @@ export function cacheResourceFuncs<T extends Resource<string>>(
           !usarCache
         );
 
+        const storeConfig =
+          resourceConf &&
+          CommonObject.Omit(resourceConf, "cache", "clear", "externalStorage");
+
         return cacheCall(
           fCache,
           fDispatch,
-          value as any,
+          func as any,
           args,
           onClear,
-          resourceConf
+          storeConfig
         ) as T;
       }
   );

@@ -1,5 +1,3 @@
-import CacheManager from "./cacheManager";
-
 export type CacheResourceFuncWithInstance = <
   T extends Resource<string>,
   TName extends string
@@ -8,18 +6,6 @@ export type CacheResourceFuncWithInstance = <
   resource: T,
   resourceConf: CacheConfig<Extract<keyof T, string>>
 ) => NamedResource<T, TName>;
-
-export interface ICacheResourceUncontrolled {
-  key: string;
-  createCache: CacheResourceFuncWithInstance;
-  getCacheStore: () => CacheState;
-  clearCache: () => void;
-}
-
-export interface CacheManagers {
-  key: string;
-  manager: CacheManager;
-}
 
 export type CacheActions = "cache" | "clear";
 
@@ -61,13 +47,10 @@ export interface ExternalStorageMethods {
   clear: (resource: string) => void;
 }
 
-export interface ExternalStorageConfig {
-  externalStorage?: ExternalStorageMethods;
-}
-
 export interface CacheConfig<IKeys extends string> extends CacheResourceConfig {
   cache?: IKeys[];
   clear?: CacheClearPayload<IKeys>["clean"][];
+  externalStorage?: ExternalStorageMethods;
 }
 
 export interface FunctionCache {
@@ -85,6 +68,12 @@ export type CacheState<T = any> = {
         cache: CacheResource<T>;
       }
     | undefined;
+};
+
+export type CacheStateKeyConfigs = Pick<CacheConfig<string>, "externalStorage">;
+
+export type CacheStateConfig = {
+  [key: string]: CacheStateKeyConfigs | undefined;
 };
 
 export type AppCacheAction =
@@ -143,9 +132,18 @@ export type ResourceFuncs<T> = {
   [K in keyof T]: T[K];
 };
 
+export interface CacheResourceInternals<T> {
+  getResource: () => CacheResource<T>;
+  clearResource: (
+    clean: Extract<keyof T, string> | CacheClearConfig<Extract<keyof T, string>>
+  ) => void;
+}
+
 export type NamedResource<T extends Resource<string>, TName extends string> = {
   /**Nombre del resource */
   name: TName;
   /**Funciones del resource */
   resources: ResourceFuncs<T>;
+  key: string;
+  _internals_: CacheResourceInternals<T>;
 };
