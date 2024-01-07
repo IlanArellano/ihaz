@@ -1,4 +1,5 @@
-import { cacheReducer, mapSelectedCleanResources } from "./logic/context";
+import { Validation } from "@ihaz/js-ui-utils";
+import { cacheReducer, mapSelectedCleanResources } from "./logic/sync/context";
 import type {
   AppCacheAction,
   CacheResource,
@@ -17,6 +18,13 @@ class CacheManager<T = any> {
   }
 
   public getCache<T>(resource: keyof T): CacheResource<T> {
+    const config = this.getConfig(resource as string);
+    if (config && config.externalStorage && config.externalStorage.get) {
+      const externalResource = config.externalStorage.get(resource as string);
+      if (!externalResource) return {} as CacheResource<T>;
+      if (!Validation.isPromiseLike(externalResource))
+        return externalResource.cache;
+    }
     return (this.store[resource]?.cache || {}) as CacheResource<T>;
   }
 
@@ -35,6 +43,8 @@ class CacheManager<T = any> {
   };
 
   private reducer(action: AppCacheAction): CacheState {
+    const resource = action.payload.resource;
+    const config = this.getConfig(resource);
     switch (action.type) {
       case "clearRec":
         if (typeof action.payload.clean === "string")

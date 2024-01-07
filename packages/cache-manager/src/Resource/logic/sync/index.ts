@@ -1,14 +1,14 @@
 import { CommonObject } from "@ihaz/js-ui-utils";
-import CacheManager from "../cacheManager";
+import CacheManager from "../../manager";
 import {
   CacheConfig,
   CacheResource,
   CacheResourceInternals,
   FunctionCacheAction,
-  NamedResource,
+  ICacheResource,
   Resource,
   ResourceCacheAction,
-} from "../types";
+} from "../../types";
 import { EMPTY_FUNCTION_CACHE } from "./context";
 import { cacheCall } from "./func";
 
@@ -32,70 +32,7 @@ function getFuncCacheDispatch<T>(
   };
 }
 
-export const createCacheImpl =
-  (cacheManager: CacheManager, key: string) =>
-  <T extends Resource<string>, TName extends string>(
-    name: TName,
-    resource: T,
-    config: CacheConfig<Extract<keyof T, string>>
-  ): NamedResource<T, TName> => {
-    const getResource: CacheResourceInternals<T>["getResource"] = () => {
-      return cacheManager.getCache(name);
-    };
-
-    const clearResource: CacheResourceInternals<T>["clearResource"] = (
-      clean
-    ) => {
-      cacheManager.dispatch({
-        type: "clearRec",
-        payload: {
-          clean,
-          resource: name,
-        },
-      });
-    };
-
-    const dispatchResource = (
-      ac: ResourceCacheAction<Extract<keyof T, string>>
-    ) => {
-      if (ac.type == "clear") {
-        clearResource(ac.payload.clean);
-        return;
-      }
-      cacheManager.dispatch({
-        type: "resource",
-        payload: {
-          resource: name,
-          action: ac,
-        },
-      });
-    };
-
-    if (config)
-      cacheManager.setResourceConfig(
-        name,
-        CommonObject.Pick(config, "externalStorage")
-      );
-
-    const retResource = cacheResourceFuncs(
-      getResource,
-      dispatchResource,
-      resource,
-      config
-    );
-
-    return {
-      name,
-      resources: retResource,
-      key,
-      _internals_: {
-        getResource,
-        clearResource,
-      },
-    };
-  };
-
-export function cacheResourceFuncs<T extends Resource<string>>(
+function cacheResourceFuncs<T extends Resource<string>>(
   get: () => CacheResource<T>,
   dispatch: (action: ResourceCacheAction<Extract<keyof T, string>>) => void,
   resource: T,
@@ -149,4 +86,66 @@ export function cacheResourceFuncs<T extends Resource<string>>(
   );
 
   return ret as any as T;
+}
+
+export default function createCacheSyncImpl(cacheManager: CacheManager) {
+  return <T extends Resource<string>, TName extends string>(
+    name: TName,
+    resource: T,
+    config: CacheConfig<Extract<keyof T, string>>
+  ): ICacheResource<T, TName> => {
+    if (config)
+      cacheManager.setResourceConfig(
+        name,
+        CommonObject.Pick(config, "externalStorage")
+      );
+
+    const getResource: CacheResourceInternals<T>["getResource"] = () => {
+      return cacheManager.getCache(name);
+    };
+
+    const clearResource: CacheResourceInternals<T>["clearResource"] = (
+      clean
+    ) => {
+      cacheManager.dispatch({
+        type: "clearRec",
+        payload: {
+          clean,
+          resource: name,
+        },
+      });
+    };
+
+    const dispatchResource = (
+      ac: ResourceCacheAction<Extract<keyof T, string>>
+    ) => {
+      if (ac.type == "clear") {
+        clearResource(ac.payload.clean);
+        return;
+      }
+      cacheManager.dispatch({
+        type: "resource",
+        payload: {
+          resource: name,
+          action: ac,
+        },
+      });
+    };
+
+    const retResource = cacheResourceFuncs(
+      getResource,
+      dispatchResource,
+      resource,
+      config
+    );
+
+    return {
+      name,
+      resources: retResource,
+      _internals_: {
+        getResource,
+        clearResource,
+      },
+    };
+  };
 }

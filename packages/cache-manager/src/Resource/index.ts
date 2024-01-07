@@ -1,9 +1,8 @@
-import CacheManager from "./cacheManager";
-import { createCacheImpl } from "./logic";
+import CacheManager from "./manager";
+import createCacheSyncImpl from "./logic/sync";
+import createExternalCacheImpl from "./logic/async";
 
 namespace CacheResource {
-  const CACHE_KEY = "_cache_manager_";
-  let CACHE_INDEX = 0;
   let cacheManager: CacheManager;
 
   const getManager = (): CacheManager => {
@@ -13,14 +12,20 @@ namespace CacheResource {
     return cacheManager;
   };
 
-  const generateKey = () => `${CACHE_KEY}${CACHE_INDEX++}`;
-
-  export const createCache: ReturnType<typeof createCacheImpl> = (
+  export const createCache: ReturnType<typeof createCacheSyncImpl> = (
     name,
     resource,
     config
   ) => {
-    return createCacheImpl(getManager(), generateKey())(name, resource, config);
+    return createCacheSyncImpl(getManager())(name, resource, config);
+  };
+
+  export const createExternalCache: typeof createExternalCacheImpl = (
+    name,
+    resource,
+    config
+  ) => {
+    return createExternalCacheImpl(name, resource, config);
   };
 }
 

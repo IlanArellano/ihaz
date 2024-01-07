@@ -6,7 +6,7 @@ import {
   FunctionCache,
   FunctionCacheAction,
   JSONValue,
-} from "../types";
+} from "../../types";
 
 function syncCacheCall(
   cache: FunctionCache,
@@ -98,20 +98,9 @@ export function cacheCall<TFunc extends (...args: any[]) => any>(
     } else {
       if (onClear) onClear();
     }
-  }
 
-  //Agrega la entrada al cache:
-  if (newEntry) {
-    //Devolver el valor en el cache:
     return newEntry.value.payload as any;
   }
 
-  if (result.async && !Validation.isPromiseLike(result.result)) {
-    //Si la función originalmente fue asíncrona pero el resultado en el cache no es una promesa
-    //Esto significa que la promesa ya se resolvió y que esta almacenado el valor síncrono en el cache
-    //Se devuelve una promesa resulta inmediatamente
-
-    return result.result as any;
-  }
   return result.result as any;
 }

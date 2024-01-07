@@ -8,7 +8,7 @@ import {
   FunctionCache,
   FunctionCacheAction,
   ResourceCacheAction,
-} from "../types";
+} from "../../types";
 
 export const EMPTY_FUNCTION_CACHE: FunctionCache = { entries: [] };
 
@@ -35,7 +35,7 @@ export function setCacheEntry(
 
   const newEntries = [
     entry,
-    ...(cache.entries || []).slice(0, config.maxSize - 1),
+    ...(cache.entries || []).slice(0, (config?.maxSize ?? 1) - 1),
   ];
 
   return {
