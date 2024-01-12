@@ -27,20 +27,22 @@ import {
   type UncontrolledComponent,
   type UncontrolledContext,
   type UncontrolledContextValue,
-} from "./utils/uncontrolled";
+} from "./utils";
 import { CacheResource } from "./Cache";
 
 export {
-  //Methods
+  //Namespaces
   ViewManager,
+  CacheResource,
+  //HOCs
   createFormManager,
   createUncontrolledClassComponent,
+  //Hooks
   useEffectAsync,
   useIntervalEffect,
   useEventHandler,
   useValueHandler,
   useLayoutEffectAsync,
-  CacheResource,
 
   //Types
   OnCloseResult,

@@ -1,5 +1,9 @@
 export type CacheActions = "cache" | "clear";
 
+export type FuncToPromise<T> = T extends (...args: infer P) => infer IRes
+  ? (...args: P) => IRes extends Promise<any> ? IRes : Promise<IRes>
+  : T;
+
 export type JSONValue =
   | string
   | number
@@ -32,18 +36,22 @@ export interface CacheClearPayload<IKeys extends string = string> {
   clean: IKeys | CacheClearConfig<IKeys>;
 }
 
-export interface ExternalStorageMethods {
+export interface ExternalStorageMethods<TName extends string = any> {
   get: (
-    resource: string
+    resource: TName
   ) => CacheStateProps | Promise<CacheStateProps> | null | undefined;
-  set: (resource: string, state: CacheStateProps) => any | Promise<any>;
-  clear: (resource: string) => void;
+  set: (resource: TName, state: CacheStateProps) => any | Promise<any>;
+  clear?: (resource: TName) => void;
 }
 
 export interface CacheConfig<IKeys extends string> extends CacheResourceConfig {
   cache?: IKeys[];
   clear?: CacheClearPayload<IKeys>["clean"][];
-  externalStorage?: ExternalStorageMethods;
+}
+
+export interface CacheConfigAsync<TName extends string, IKeys extends string>
+  extends CacheConfig<IKeys> {
+  externalStorage: ExternalStorageMethods<TName>;
 }
 
 export interface FunctionCache {
@@ -61,12 +69,6 @@ export interface CacheStateProps<T = any> {
 
 export type CacheState<T = any> = {
   [key: string]: CacheStateProps<T> | undefined;
-};
-
-export type CacheStateKeyConfigs = Pick<CacheConfig<string>, "externalStorage">;
-
-export type CacheStateConfig = {
-  [resource: string]: CacheStateKeyConfigs | undefined;
 };
 
 export type AppCacheAction =
@@ -126,36 +128,40 @@ export type Resource<TKeys extends string> = {
 export type ResourceFuncs<T> = {
   [K in keyof T]: T[K];
 };
+export type ResourceFuncsAsync<T> = {
+  [K in keyof T]: FuncToPromise<T[K]>;
+};
 
 export interface CacheResourceInternals<T> {
-  getResource: () => CacheResource<T>;
+  getResource: () => CacheStateProps<T>;
   clearResource: (
     clean: Extract<keyof T, string> | CacheClearConfig<Extract<keyof T, string>>
   ) => void;
 }
 
 export interface CacheResourceInternalsAsync<T> {
-  getResource: () => Promise<CacheResource<T>>;
+  getResource: () => PromiseLike<CacheStateProps<T>>;
   clearResource: (
     clean: Extract<keyof T, string> | CacheClearConfig<Extract<keyof T, string>>
-  ) => Promise<void>;
+  ) => PromiseLike<void>;
 }
 
-export type NamedResource<T extends Resource<string>, TName extends string> = {
-  resources: ResourceFuncs<T>;
+export type NamedResource<TName extends string> = {
   name: TName;
 };
 
 export interface ICacheResource<
   T extends Resource<string>,
   TName extends string
-> extends NamedResource<T, TName> {
+> extends NamedResource<TName> {
+  resources: ResourceFuncs<T>;
   _internals_: CacheResourceInternals<T>;
 }
 
 export interface ICacheResourceAsync<
   T extends Resource<string>,
   TName extends string
-> extends NamedResource<T, TName> {
+> extends NamedResource<TName> {
+  resources: ResourceFuncsAsync<T>;
   _internals_: CacheResourceInternalsAsync<T>;
 }

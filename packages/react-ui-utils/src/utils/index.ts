@@ -1,1 +1,1 @@
-export * from "./uncontrolled";
+export * from "./uncontrolled/class";

@@ -1,6 +1,6 @@
 {
   "name": "@ihaz/react-ui-utils",
-  "version": "1.3.0",
+  "version": "1.4.0",
   "description": "A cross-platform general UI common methods for React Projects",
   "type": "module",
   "main": "lib/index.js",

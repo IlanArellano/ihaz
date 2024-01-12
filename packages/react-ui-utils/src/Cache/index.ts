@@ -6,6 +6,11 @@ import type {
   ICacheResourceUncontrolled,
 } from "./types";
 
+/**
+ * Cache Resource Manager
+ * @deprecated
+ * These methods is no longer support and it will be remove in future versions, use `@ihaz/cache-manager` package instead
+ */
 export namespace CacheResource {
   const CACHE_KEY = "_cache_manager_";
   let CACHE_INDEX = 0;
@@ -18,14 +23,20 @@ export namespace CacheResource {
     payload: { resource: "" },
   };
 
-  /**Clear all Cache by the key of any `Resource Managers` created by `createCacheResources` method */
+  /**Clear all Cache by the key of any `Resource Managers` created by `createCacheResources` method
+   * @deprecated
+   * This method is no longer support and it will be remove in future versions, use `@ihaz/cache-manager` package instead
+   */
   export const clearCacheByResource = (key: string) => {
     const findManager = managers.find((x) => x.key === key);
     if (!findManager) return;
     findManager.manager.dispatch(CACHE_CLEAR);
   };
 
-  /**Creates a enviroment that can set a method's collection */
+  /**Creates a enviroment that can set a method's collection
+   * @deprecated
+   * This method is no longer support and it will be remove in future versions, use `@ihaz/cache-manager` package instead
+   */
   export const createCacheResources = (): ICacheResourceUncontrolled => {
     const key = generateKey();
     const cacheManager = new CacheManager();
@@ -47,7 +58,10 @@ export namespace CacheResource {
     };
   };
 
-  /**Remove the Cache for all the store from `Resource Managers` created */
+  /**Remove the Cache for all the store from `Resource Managers` created
+   * @deprecated
+   * This method is no longer support and it will be remove in future versions, use `@ihaz/cache-manager` package instead
+   */
   export const clearAllCache = () => {
     managers.forEach((x) => {
       x.manager.dispatch(CACHE_CLEAR);

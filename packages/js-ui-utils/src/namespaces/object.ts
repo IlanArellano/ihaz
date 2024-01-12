@@ -1,4 +1,4 @@
-import { DeepRecord } from "@utils/types";
+import { DeepRecord, _Object } from "@utils/types";
 import { Client } from "./client";
 
 type MapObjectOut<T, TOut> = { [K in keyof T]: TOut };
@@ -50,6 +50,27 @@ export namespace CommonObject {
     });
 
     return newObj;
+  };
+
+  export const setGettersAndSetters = <T extends _Object>(
+    obj: T,
+    config: Partial<{
+      [IKey in keyof T]: {
+        get: (key: IKey, value: T[IKey]) => T[IKey];
+        set?: (key: IKey, newValue: T[IKey]) => void;
+      };
+    }>
+  ) => {
+    const newObj: T = {} as T;
+
+    Object.keys(obj).forEach((key) => {
+      Object.defineProperty(newObj, key, {
+        get: () =>
+          config[key] && config[key]?.get
+            ? config[key]!.get(key, obj[key])
+            : obj[key],
+      });
+    });
   };
 
   export function ChangeValueFromObject<
