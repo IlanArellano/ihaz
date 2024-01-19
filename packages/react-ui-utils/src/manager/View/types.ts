@@ -1,6 +1,6 @@
 import { EventHandler } from "@ihaz/js-ui-utils";
 import { _Object } from "@utils/types";
-import { UncontrolledComponent } from "@utils/utils/uncontrolled";
+import { UncontrolledComponent } from "@utils/utils";
 import { ComponentType } from "react";
 import { ViewTree } from "./tree";
 

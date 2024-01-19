@@ -14,13 +14,15 @@ import { ParametersWithoutFistParam, _Object } from "@utils/types";
 import { CommonObject } from "@ihaz/js-ui-utils";
 import {
   CustomComponentClass,
-  Methods,
-  MethodsWithInstance,
   Options,
   UncontolledContextAction,
-  UncontrolledComponent,
   UncontrolledContextValue,
 } from "./types";
+import {
+  Methods,
+  MethodsWithInstance,
+  UncontrolledComponent,
+} from "../shared/types";
 
 const isClassComponent = (component: any) =>
   typeof component === "function" && !!component.prototype.isReactComponent;

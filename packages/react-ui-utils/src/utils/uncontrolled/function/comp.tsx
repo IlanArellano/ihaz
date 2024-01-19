@@ -1,76 +1,115 @@
+import React, { forwardRef, type ComponentType, type FC } from "react";
 import { CommonObject } from "@ihaz/js-ui-utils";
-import React, {
-  ComponentType,
-  createContext,
-  FC,
-  forwardRef,
-  MutableRefObject,
-  PropsWithChildren,
-  useImperativeHandle,
-  useRef,
-} from "react";
-import { FunctionalMethods } from "./types";
+import type { ParametersWithoutFistParam, _Object } from "@utils/types";
+import type { MethodsStored, UncontrolledComponent } from "../shared/types";
+import type { FunctionalManagerMethods, FunctionalMethods } from "./types";
 
-interface FunctionalManagerMethods<IMethods> {
-  set: <IKey extends keyof IMethods>(key: IKey, value: IMethods[IKey]) => void;
+interface ContextManager<IMethods extends FunctionalMethods<IMethods>, IProps> {
+  Parent: ComponentType<IProps>;
+  isInstanceMounted: () => boolean;
+  managerMethods: MethodsStored<IMethods>;
 }
 
-interface ContextManager<IMethods> {
-  Provider: ComponentType<PropsWithChildren>;
-  managerMethods: FunctionalManagerMethods<IMethods>;
-}
-
-const createFunctionalCostumer = <
-  IComponent extends FC<FunctionalManagerMethods<IMethods>>,
-  IMethods extends FunctionalMethods<IMethods>
+const createFunctionalInstance = <
+  IComponent extends FC<P>,
+  IMethods,
+  P = IComponent extends FC<FunctionalManagerMethods<IMethods> & infer IProps>
+    ? IProps
+    : {}
 >(
   Comp: IComponent
 ) => {
-  return forwardRef<
-    IMethods,
-    IComponent extends FC<infer IProps> ? IProps : {}
-  >((_, ref) => {
+  const _instance: Partial<IMethods> = {};
+  let callbackCalled = false;
+  return forwardRef<Partial<IMethods>>((_, ref) => {
     const set: FunctionalManagerMethods<IMethods>["set"] = (key, value) => {
-      const methods = (ref as MutableRefObject<IMethods>).current;
-      if (value && methods[key]) Object.defineProperty(methods, key, value);
+      if (key && value) _instance[key] = value;
+      console.log({ _instance, key, value });
+      if (!callbackCalled) {
+        const refFunc = ref as (x: Partial<IMethods> | null) => void;
+        refFunc(_instance);
+        callbackCalled = true;
+      }
     };
 
-    return <Comp set={set} />;
+    return (
+      <>
+        {/* @ts-ignore */}
+        <Comp set={set} />
+      </>
+    );
   });
 };
 
 const createFunctionalContextManager = <
-  IComponent extends FC<any>,
-  IMethods extends FunctionalMethods<IMethods>
+  IComponent extends FC<P>,
+  IMethods extends FunctionalMethods<IMethods>,
+  P = IComponent extends FC<FunctionalManagerMethods<IMethods> & infer IProps>
+    ? IProps
+    : {}
 >(
   Comp: IComponent,
-  methods: IMethods | null
-): ContextManager<IMethods> => {
-  const Costumer = createFunctionalCostumer(Comp);
+  methods: FunctionalMethods<IMethods>
+): ContextManager<IMethods, P> => {
+  const Component = createFunctionalInstance<IComponent, IMethods, P>(Comp);
+  let instance: Partial<IMethods> | null = null;
+  const getInstance = () => instance;
+  const isInstanceMounted = () => !!instance;
+
+  const final = CommonObject.createObjectWithGetters(methods, (key, func) => {
+    const newFunc = (...args: ParametersWithoutFistParam<typeof func>) => {
+      if (!isInstanceMounted())
+        throw new Error("Component has not been initializated");
+      const currInstance = getInstance();
+      if (!currInstance![key])
+        throw new Error(
+          `Method ${String(key)} has no been setted from uncontrolled component`
+        );
+      return func(currInstance as IMethods, ...args);
+    };
+    return newFunc;
+  }) as unknown as MethodsStored<IMethods>;
   return {
-    Provider: ({ children }) => {
-      const handleRef = (x: FunctionalManagerMethods<IMethods> | null) => {
+    Parent: () => {
+      const handleRef = (x: Partial<IMethods> | null) => {
+        console.log({ x });
         instance = x;
       };
-      return <Costumer ref={(ref) => ref} />;
+      return <Component ref={handleRef} />;
     },
-    managerMethods: {
-      set,
-    },
+    managerMethods: final,
+    isInstanceMounted,
   };
 };
 
 const isFunctionalComponent = (component: any) =>
   typeof component === "function" && !component.prototype.isReactComponent;
 
-export function createUncontrolledFunctionalComponent<
+export function createUncontrolledFC<
   IComponent extends FC<P>,
-  IMethods extends FunctionalMethods<IMethods>,
-  P = IComponent extends FC<infer IProps> ? IProps : {}
->(Comp: IComponent, methods: IMethods) {
+  IMethods extends _Object,
+  P = IComponent extends FC<FunctionalManagerMethods<IMethods> & infer IProps>
+    ? IProps
+    : {}
+>(
+  Comp: IComponent,
+  methods: FunctionalMethods<IMethods>
+): MethodsStored<FunctionalMethods<IMethods>> &
+  Omit<
+    UncontrolledComponent<Omit<P, keyof FunctionalManagerMethods<IMethods>>>,
+    "getStore"
+  > {
   if (!isFunctionalComponent(Comp))
     throw new Error("this Method only allows functional components.");
 
-  let methodsCopy: IMethods | null = CommonObject.DeepCopy(methods);
-  const FinalComponent = createFunctionalContextManager(Comp, methodsCopy);
+  const context = createFunctionalContextManager<IComponent, IMethods, P>(
+    Comp,
+    methods
+  );
+
+  return {
+    Component: context.Parent,
+    isInstanceMounted: context.isInstanceMounted,
+    ...context.managerMethods,
+  };
 }
