@@ -9,62 +9,71 @@ import type {
 import { ResourceInvariant } from "../context";
 import cacheResourceFuncs from "./func";
 
-export default function createCacheSyncImpl(cacheManager: CacheManager) {
-  return <T extends Resource<string>, TName extends string>(
-    name: TName,
-    resource: T,
-    config: CacheConfig<Extract<keyof T, string>>
-  ): ICacheResource<T, TName> => {
-    ResourceInvariant(name, resource);
-    if (cacheManager.hasResourceExist(name))
-      throw new Error("Resource has already exist in store");
+let cacheManager: CacheManager;
 
-    const getResource: CacheResourceInternals<T>["getResource"] = () => {
-      return cacheManager.getCache(name);
-    };
+const getManager = (): CacheManager => {
+  if (!cacheManager) {
+    cacheManager = new CacheManager();
+  }
+  return cacheManager;
+};
 
-    const clearResource: CacheResourceInternals<T>["clearResource"] = (
-      clean
-    ) => {
-      cacheManager.dispatch({
-        type: "clearRec",
-        payload: {
-          clean,
-          resource: name,
-        },
-      });
-    };
+export default function createCacheSyncImpl<
+  T extends Resource<string>,
+  TName extends string
+>(
+  name: TName,
+  resource: T,
+  config: CacheConfig<Extract<keyof T, string>>
+): ICacheResource<T, TName> {
+  ResourceInvariant(name, resource);
+  const cacheManager = getManager();
+  if (cacheManager.hasResourceExist(name))
+    throw new Error("Resource has already exist in store");
 
-    const dispatchResource = (
-      ac: ResourceCacheAction<Extract<keyof T, string>>
-    ) => {
-      if (ac.type == "clear") {
-        clearResource(ac.payload.clean);
-        return;
-      }
-      cacheManager.dispatch({
-        type: "resource",
-        payload: {
-          resource: name,
-          action: ac,
-        },
-      });
-    };
+  const getResource: CacheResourceInternals<T>["getResource"] = () => {
+    return cacheManager.getCache(name);
+  };
 
-    const retResource = cacheResourceFuncs(
-      getResource,
-      dispatchResource,
-      resource,
-      config
-    );
-
-    return {
-      name,
-      resources: retResource,
-      _internals_: {
-        getResource,
-        clearResource,
+  const clearResource: CacheResourceInternals<T>["clearResource"] = (clean) => {
+    cacheManager.dispatch({
+      type: "clearRec",
+      payload: {
+        clean,
+        resource: name,
       },
-    };
+    });
+  };
+
+  const dispatchResource = (
+    ac: ResourceCacheAction<Extract<keyof T, string>>
+  ) => {
+    if (ac.type == "clear") {
+      clearResource(ac.payload.clean);
+      return;
+    }
+    cacheManager.dispatch({
+      type: "resource",
+      payload: {
+        resource: name,
+        action: ac,
+      },
+    });
+  };
+
+  const retResource = cacheResourceFuncs(
+    getResource,
+    dispatchResource,
+    resource,
+    config
+  );
+
+  return {
+    name,
+    resources: retResource,
+    _internals_: {
+      getResource,
+      clearResource,
+    },
   };
 }

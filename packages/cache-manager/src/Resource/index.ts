@@ -1,15 +1,22 @@
-import CacheManager from "./logic/store/manager";
 import createCacheSyncImpl from "./logic/store";
 import createExternalCacheImpl from "./logic/external";
+import { clearSingleCacheImpl, createSingleCacheImpl } from "./logic/single";
+import type { CacheConfigSingle, ResourceFunction } from "./types";
 
 namespace CacheResource {
-  let cacheManager: CacheManager;
+  /**Create a single cache function where the result is stored in memory */
+  export const cache = <T extends ResourceFunction>(
+    fn: T,
+    config?: CacheConfigSingle
+  ): T => {
+    return createSingleCacheImpl(fn, config);
+  };
 
-  const getManager = (): CacheManager => {
-    if (!cacheManager) {
-      cacheManager = new CacheManager();
-    }
-    return cacheManager;
+  /**Clear a single cache function created by `cache` method, return `true` if function resource was
+   * cleared successfully, otherwise return `false`
+   */
+  export const clear = <T extends ResourceFunction>(fn: T): boolean => {
+    return clearSingleCacheImpl(fn);
   };
 
   /**Create a resource collection which store the result of every
@@ -18,12 +25,12 @@ namespace CacheResource {
    * otherwise, the cache will clean and will resolve once again the original
    * method.
    */
-  export const createCache: ReturnType<typeof createCacheSyncImpl> = (
+  export const createCacheResources: typeof createCacheSyncImpl = (
     name,
     resource,
     config
   ) => {
-    return createCacheSyncImpl(getManager())(name, resource, config);
+    return createCacheSyncImpl(name, resource, config);
   };
 
   /**Create a resource collection which store the result of every
@@ -32,7 +39,7 @@ namespace CacheResource {
    * otherwise, the cache will clean and will resolve once again the original
    * method.
    */
-  export const createExternalCache: typeof createExternalCacheImpl = (
+  export const createExternalCacheResources: typeof createExternalCacheImpl = (
     name,
     resource,
     config

@@ -52,6 +52,21 @@ export namespace CommonObject {
     return newObj;
   };
 
+  export const createGetterResource = <
+    T extends (...args: any[]) => any,
+    IResult extends T extends (...args: any[]) => infer Res ? Res : never
+  >(
+    func: T
+  ): ((...args: any[]) => IResult) => {
+    let value: IResult | null = null;
+    return function () {
+      if (value === null) {
+        value = func.apply(null, arguments);
+      }
+      return value!;
+    };
+  };
+
   export function ChangeValueFromObject<
     T extends { [key: string]: any },
     IValue
@@ -109,6 +124,28 @@ export namespace CommonObject {
     }
 
     return true;
+  };
+
+  export const objectToString = <T extends _Object>(obj: T): string => {
+    if (
+      (typeof obj !== "object" && typeof obj !== "function") ||
+      obj === null
+    ) {
+      return String(obj);
+    }
+    if (typeof obj === "function") {
+      return (obj as Function).toString();
+    }
+    if (Array.isArray(obj)) {
+      return (obj as any[]).map((it) => objectToString(it as T)).join("\n");
+    }
+    const newObj: { [key in keyof T]: string } = {} as {
+      [key in keyof T]: string;
+    };
+    for (let key in obj as T) {
+      newObj[key] = objectToString(obj[key]);
+    }
+    return JSON.stringify(newObj);
   };
 
   export const DeepCopy = <T>(value: T) =>

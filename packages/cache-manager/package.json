@@ -1,7 +1,7 @@
 {
   "name": "@ihaz/cache-manager",
   "version": "1.0.0",
-  "description": "A cache manager that can store items and resources in memory or storage manager",
+  "description": "A cache manager which store items and resources in memory or storage manager",
   "type": "module",
   "main": "lib/index.js",
   "module": "lib/index.es.js",
