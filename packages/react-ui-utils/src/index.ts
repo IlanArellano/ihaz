@@ -6,6 +6,7 @@ import {
   useLayoutEffectAsync,
 } from "./hooks";
 import {
+  createFormManager,
   ViewManager,
   type OnCloseResult,
   type ViewComponentProps,
@@ -15,8 +16,7 @@ import {
   type ViewSyncResult,
   type ViewSyncStartOptions,
   type ViewUncontrolledComp,
-} from "./manager";
-import { createFormManager } from "./components";
+} from "./HOC";
 import {
   createUncontrolledClassComponent,
   type CustomComponentClass,
