@@ -6,7 +6,18 @@ import {
   useLayoutEffectAsync,
 } from "./hooks";
 import {
-  ViewManager,
+  createFormManager,
+  createViewManager,
+  withStatus,
+  type FieldProps,
+  type FormContext,
+  type FormManager,
+  type FormProps,
+  type FormValueState,
+  type FormValueStateResolved,
+  type Validation,
+  type ValidationPredicate,
+  type ValidationResolve,
   type OnCloseResult,
   type ViewComponentProps,
   type ViewManagerComponentProps,
@@ -15,8 +26,7 @@ import {
   type ViewSyncResult,
   type ViewSyncStartOptions,
   type ViewUncontrolledComp,
-} from "./manager";
-import { createFormManager } from "./components";
+} from "./HOC";
 import {
   createUncontrolledClassComponent,
   createUncontrolledFC,
@@ -37,10 +47,12 @@ import { CacheResource } from "./Cache";
 
 export {
   //Namespaces
-  ViewManager,
   CacheResource,
   //HOCs
   createFormManager,
+  createViewManager,
+  withStatus,
+  //Utils
   createUncontrolledClassComponent,
   createUncontrolledFC,
   //Hooks
@@ -71,4 +83,13 @@ export {
   FunctionalMethods,
   MethodsStored,
   MethodsWithStore,
+  FieldProps,
+  FormContext,
+  FormManager,
+  FormProps,
+  FormValueState,
+  FormValueStateResolved,
+  Validation,
+  ValidationPredicate,
+  ValidationResolve,
 };

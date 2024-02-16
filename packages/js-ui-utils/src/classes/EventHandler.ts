@@ -1,36 +1,59 @@
-type Callback<IValue> = ((value?: IValue) => void) | undefined;
+export type EventsMap<IEvents extends string> = {
+  [IEvent in IEvents]: (...args: any[]) => void;
+};
 
-export const getEventId = (event: string) => `_${event}`;
-
-interface EventsList<IValue> {
-  id: string;
-  callback: Callback<IValue>;
+export interface EventsList<IEvent extends keyof EventsMap<string>> {
+  id: IEvent;
+  callback: EventsMap<string>[IEvent];
 }
 
-export class EventHandler<IValue = any> {
-  private list: EventsList<IValue>[] = [];
+export class EventHandler<
+  IEvents extends EventsMap<Extract<keyof IEvents, string>>
+> {
+  private list: EventsList<Extract<keyof IEvents, string>>[];
 
-  suscribe(id: string, callback: Callback<IValue>) {
+  constructor() {
+    this.list = [];
+  }
+
+  public suscribe<IKeyEvents extends Extract<keyof IEvents, string>>(
+    id: IKeyEvents,
+    callback: EventsMap<string>[IKeyEvents]
+  ) {
     this.list.push({ callback, id });
   }
 
-  isAnyEventSuscribed = () => !!this.list.length;
+  private checkCallback = (callback: Function) =>
+    callback && callback instanceof Function;
 
-  isSuscribed = (id: string, callback: Callback<IValue>) =>
-    this.list.some(
+  public isAnyEventSuscribed = () => !!this.list.length;
+
+  public isSuscribed = <IKeyEvents extends Extract<keyof IEvents, string>>(
+    id: IKeyEvents,
+    callback: EventsMap<string>[IKeyEvents]
+  ): boolean => {
+    if (!this.checkCallback(callback)) return false;
+    return this.list.some(
       (evt) =>
         evt.id === id && evt.callback?.toString() === callback?.toString()
     );
+  };
 
-  listen(id: string, value?: IValue) {
+  public listen<IKeyEvents extends Extract<keyof IEvents, string>>(
+    id: IKeyEvents,
+    ...restValues: Parameters<EventsMap<string>[IKeyEvents]>
+  ) {
     if (!this.list.length) return;
-    this.executeEvent(id, value);
+    this.executeEvent(id, ...restValues);
   }
 
-  private executeEvent(id: string, value?: IValue) {
+  private executeEvent<IKeyEvents extends Extract<keyof IEvents, string>>(
+    id: string,
+    ...restValues: Parameters<EventsMap<string>[IKeyEvents]>
+  ) {
     this.list.forEach((x) => {
       if (x.id !== id) return;
-      if (x.callback) x.callback(value);
+      if (x.callback) x.callback(...restValues);
     });
   }
 
@@ -39,18 +62,24 @@ export class EventHandler<IValue = any> {
     this.clearAll();
   }
 
-  clear(id: string, callback: Callback<IValue>) {
+  public clear<IKeyEvents extends Extract<keyof IEvents, string>>(
+    id: string,
+    callback: EventsMap<string>[IKeyEvents]
+  ) {
+    if (!this.checkCallback(callback)) return;
     this.list = this.list.filter(
       (evt) =>
-        evt.id !== id && evt.callback?.toString() === callback?.toString()
+        evt.id !== id && evt.callback?.toString() !== callback?.toString()
     );
   }
 
-  clearByEvent(id: string) {
+  public clearByEvent<IKeyEvents extends Extract<keyof IEvents, string>>(
+    id: IKeyEvents
+  ) {
     this.list = this.list.filter((evt) => evt.id !== id);
   }
 
-  clearAll() {
+  public clearAll() {
     this.list = [];
   }
 }

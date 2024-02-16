@@ -1,0 +1,1 @@
+export type Keys = string | number | null | void | symbol | boolean;

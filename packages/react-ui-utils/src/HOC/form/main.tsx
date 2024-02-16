@@ -15,6 +15,7 @@ import { ControlForm, ControlView } from "./controlView";
 import {
   FieldProps,
   FormContext,
+  FormEventsMapping,
   FormManager,
   FormProps,
   FormValueState,
@@ -54,9 +55,8 @@ const CheckValidation = <T,>(
     return v === true;
   });
 
-const getEventId = (event: string) => `_${event}`;
-
 /**
+ * @experimental
  * Returns a Form enviroment that provides a `Form` component that can be used and handled by internal state using a `Field`
  * component that can change every prop from the state
  * @param initial Initial value state
@@ -95,27 +95,27 @@ const { Form, Field, Submit, useFormValue } = createFormManager(initial, {
 };
  * ```
  */
-export function createFormManager<T extends { [key: string]: any }>(
+export default function createFormManager<T extends { [key: string]: any }>(
   initial: T,
   validation?: Validation<T>
 ): FormManager<T> {
   if (!initial) throw new Error("initial form value not provided");
-  if (typeof initial !== "object")
+  if (typeof initial !== "object" || Array.isArray(initial))
     throw new Error(
-      "initial value allows only a non primitive values and common objects"
+      `initial value allows only object values but it provides ${
+        Array.isArray(initial) ? "array" : typeof initial
+      }`
     );
-  const _event = new EventHandler<FormValueState<T>>();
+  const _event = new EventHandler<FormEventsMapping>();
   const _field_register = new ValueHandler<(keyof T)[]>([]);
   const initialFormCtx: FormContext<T> = {
     value: initial,
     itemManager: {
       addEventListenner: (event, fn) => {
-        const id = getEventId(event);
-        _event.suscribe(id, fn);
+        _event.suscribe(event, fn);
       },
       removeEventListenner: (event, fn) => {
-        const id = getEventId(event);
-        _event.clear(id, fn);
+        _event.clear(event, fn);
       },
     },
     onChange: undefined,
@@ -160,8 +160,7 @@ export function createFormManager<T extends { [key: string]: any }>(
           ...validationPredicate,
         },
       }));
-      const id = getEventId("change");
-      _event.listen(id, {
+      _event.listen("change", {
         value: newValue,
         isValidated: validationPredicate,
       });
@@ -217,6 +216,10 @@ export function createFormManager<T extends { [key: string]: any }>(
     } = React.InputHTMLAttributes<HTMLInputElement>
   >(props: FieldProps<TProps, T>, ref: React.ForwardedRef<any>) {
     const formctx = useContext(FormCxt);
+    if (formctx === undefined)
+      throw new Error(
+        "<Field> Component only can be rendered by <Form> Component from the HOC call"
+      );
 
     useEffect(() => {
       _field_register.set(_field_register.get().concat(props.field));
@@ -227,11 +230,6 @@ export function createFormManager<T extends { [key: string]: any }>(
           }' has been declare more than once, it might cause some conflicts`
         );
       }
-      const value = formctx.value;
-      if (!value)
-        throw new Error(
-          "<Field> Component only can be rendered by <Form> Component from the HOC call"
-        );
 
       return () => {
         if (_field_register.get().some((x) => x === props.field))

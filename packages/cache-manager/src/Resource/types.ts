@@ -44,6 +44,23 @@ export interface ExternalStorageMethods<TName extends string = any> {
   clear?: (resource: TName) => void;
 }
 
+export type CacheEnvironment = "client" | "server" | "hybrid";
+
+export interface CacheConfigEnvironment {
+  environment?: CacheEnvironment;
+}
+
+export interface CacheConfigSingle extends CacheConfigEnvironment {
+  /**
+   * @default true
+   * clear function cache result when the fuction call throw any error. */
+  clearOnError?: boolean;
+  /**If set true, force all the object or mutable arg values to persist the same reference to storage the result in cache,
+   * when the reference has change, the cache function result will be clean. `This config is for only client and hybrid environment.`
+   */
+  forceArgsReference?: boolean;
+}
+
 export interface CacheConfig<IKeys extends string> extends CacheResourceConfig {
   cache?: IKeys[];
   clear?: CacheClearPayload<IKeys>["clean"][];
@@ -117,12 +134,14 @@ export type FunctionCacheAction =
       payload: { error: Error };
     };
 
-export interface CacheResourceConfig {
+export interface CacheResourceConfig extends CacheConfigEnvironment {
   maxSize?: number;
 }
 
+export type ResourceFunction = (...args: any[]) => any;
+
 export type Resource<TKeys extends string> = {
-  [K in TKeys]: (...args: any[]) => any;
+  [K in TKeys]: ResourceFunction;
 };
 
 export type ResourceFuncs<T> = {
@@ -165,3 +184,9 @@ export interface ICacheResourceAsync<
   resources: ResourceFuncsAsync<T>;
   _internals_: CacheResourceInternalsAsync<T>;
 }
+
+export type ResourceFunctionContext<T extends ResourceFunction> = T & {
+  _internals_?: Required<Pick<CacheConfigEnvironment, "environment">> & {
+    originalFn?: T;
+  };
+};

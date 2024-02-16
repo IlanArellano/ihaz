@@ -1,5 +1,10 @@
 import { EventHandler, ValueHandler } from "@ihaz/js-ui-utils";
-import type { ComponentRegister, EventHandlerRegister, Status } from "./types";
+import type {
+  ComponentRegister,
+  EventHandlerRegister,
+  EventHandlerRegisterMapping,
+  Status,
+} from "./types";
 
 export const VIEW_TREE_EVENT = "close";
 
@@ -52,7 +57,7 @@ export class ViewTree {
       this.componentMountEvents.set(
         this.componentMountEvents.get().concat({
           key: entry.key,
-          event: new EventHandler(),
+          event: new EventHandler<EventHandlerRegisterMapping>(),
         })
       );
     }

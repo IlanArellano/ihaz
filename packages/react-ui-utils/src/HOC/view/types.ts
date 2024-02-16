@@ -55,7 +55,7 @@ export type ShowFuncSync = <TProps>(
 export type ConditionView = (x: Entry) => boolean;
 
 export interface ViewManagerComponentProps {
-  Tree: ViewTree;
+  getTree: () => ViewTree;
 }
 
 export interface ViewUncontrolledComp
@@ -68,7 +68,7 @@ export interface ViewUncontrolledComp
 export interface ViewMethods {
   Component: ComponentType;
   getTree: () => ViewTree;
-  createViewContextComponent: TreeComponent;
+  withViewContext: TreeComponent;
 }
 
 export type IViewManager = Omit<ViewUncontrolledComp, "Component"> &
@@ -76,7 +76,7 @@ export type IViewManager = Omit<ViewUncontrolledComp, "Component"> &
 
 export type TreeComponent = <T extends _Object>(
   ComponentWithRef: ComponentType<T>,
-  key: string
+  contextName: string
 ) => ComponentType<T>;
 
 export type Status = "mounted" | "unmounted";
@@ -86,7 +86,11 @@ export interface ComponentRegister {
   status: Status;
 }
 
+export type EventHandlerRegisterMapping = {
+  close: () => void;
+};
+
 export interface EventHandlerRegister {
   key: string;
-  event: EventHandler;
+  event: EventHandler<EventHandlerRegisterMapping>;
 }
