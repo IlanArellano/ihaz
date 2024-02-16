@@ -7,7 +7,17 @@ import {
 } from "./hooks";
 import {
   createFormManager,
-  ViewManager,
+  createViewManager,
+  withStatus,
+  type FieldProps,
+  type FormContext,
+  type FormManager,
+  type FormProps,
+  type FormValueState,
+  type FormValueStateResolved,
+  type Validation,
+  type ValidationPredicate,
+  type ValidationResolve,
   type OnCloseResult,
   type ViewComponentProps,
   type ViewManagerComponentProps,
@@ -32,10 +42,12 @@ import { CacheResource } from "./Cache";
 
 export {
   //Namespaces
-  ViewManager,
   CacheResource,
   //HOCs
   createFormManager,
+  createViewManager,
+  withStatus,
+  //Utils
   createUncontrolledClassComponent,
   //Hooks
   useEffectAsync,
@@ -61,4 +73,13 @@ export {
   UncontrolledComponent,
   UncontrolledContext,
   UncontrolledContextValue,
+  FieldProps,
+  FormContext,
+  FormManager,
+  FormProps,
+  FormValueState,
+  FormValueStateResolved,
+  Validation,
+  ValidationPredicate,
+  ValidationResolve,
 };

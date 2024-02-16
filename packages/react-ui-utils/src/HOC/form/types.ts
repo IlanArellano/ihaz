@@ -3,6 +3,10 @@ import type { PropsWithChildren, ReactNode } from "react";
 
 export type ValidationPredicate<IValue> = (value: IValue) => boolean;
 
+export type FormEventsMapping = {
+  change: <T>(result: FormValueState<T>) => void;
+};
+
 export type Validation<T> = {
   [K in keyof T]?: T[K] extends object
     ? Validation<T>

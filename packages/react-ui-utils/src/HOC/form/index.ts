@@ -1,4 +1,4 @@
-export { createFormManager } from "./main";
+export { default } from "./main";
 export type {
   FieldProps,
   FormContext,

@@ -27,6 +27,7 @@ export class ViewManagerComponent extends PureComponent<
   show: ShowFunc = (render, props, context) => {
     return new Promise((resolve) => {
       const currId = this.state.nextId;
+      const tree = this.props.getTree();
 
       const entry: Entry = {
         id: currId,
@@ -35,10 +36,7 @@ export class ViewManagerComponent extends PureComponent<
           onClose: (result: any) => {
             this.handleClose(currId, resolve)(result);
             let handler: EventHandlerRegister | undefined;
-            if (
-              context &&
-              (handler = this.props.Tree.getComponentHandler(context))
-            ) {
+            if (context && (handler = tree.getComponentHandler(context))) {
               handler.event.clearByEvent(VIEW_TREE_EVENT);
             }
           },
@@ -46,12 +44,13 @@ export class ViewManagerComponent extends PureComponent<
         },
       };
 
-      this.startModal(entry, resolve, context);
+      this.startView(entry, resolve, context);
     });
   };
 
   showSync: ShowFuncSync = (render, props, onCloseListenner, context) => {
     const currId = this.state.nextId;
+    const tree = this.props.getTree();
 
     const entry: Entry = {
       id: currId,
@@ -61,10 +60,7 @@ export class ViewManagerComponent extends PureComponent<
         onClose: (res) => {
           this.handleCloseSync(currId);
           let handler: EventHandlerRegister | undefined;
-          if (
-            context &&
-            (handler = this.props.Tree.getComponentHandler(context))
-          ) {
+          if (context && (handler = tree.getComponentHandler(context))) {
             handler.event.clearByEvent(VIEW_TREE_EVENT);
           }
           if (onCloseListenner) onCloseListenner(res as never);
@@ -74,9 +70,9 @@ export class ViewManagerComponent extends PureComponent<
 
     return {
       start: (options) => {
-        if (!options?.delay) return this.startModalSync(entry, context);
+        if (!options?.delay) return this.startViewSync(entry, context);
         Stack.Sleep(options.delay).then(() =>
-          this.startModalSync(entry, context)
+          this.startViewSync(entry, context)
         );
       },
       close: () => {
@@ -86,14 +82,15 @@ export class ViewManagerComponent extends PureComponent<
     };
   };
 
-  private startModal = (
+  private startView = (
     entry: Entry,
     resolve: (value: any) => void,
     context?: string
   ) => {
+    const tree = this.props.getTree();
     if (context) {
-      const componentDetails = this.props.Tree.getComponentDetails(context);
-      const handler = this.props.Tree.getComponentHandler(context);
+      const componentDetails = tree.getComponentDetails(context);
+      const handler = tree.getComponentHandler(context);
       if (
         componentDetails &&
         componentDetails.status === "mounted" &&
@@ -114,10 +111,11 @@ export class ViewManagerComponent extends PureComponent<
     }
   };
 
-  private startModalSync = (entry: Entry, context?: string) => {
+  private startViewSync = (entry: Entry, context?: string) => {
+    const tree = this.props.getTree();
     if (context) {
-      const componentDetails = this.props.Tree.getComponentDetails(context);
-      const handler = this.props.Tree.getComponentHandler(context);
+      const componentDetails = tree.getComponentDetails(context);
+      const handler = tree.getComponentHandler(context);
       if (
         componentDetails &&
         componentDetails.status === "mounted" &&

@@ -1,4 +1,4 @@
-export { ViewManager } from "./create";
+export { default } from "./create";
 export type {
   ViewProps,
   ViewComponentProps,
