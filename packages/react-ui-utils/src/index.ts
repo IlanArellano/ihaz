@@ -19,6 +19,11 @@ import {
 import { createFormManager } from "./components";
 import {
   createUncontrolledClassComponent,
+  createUncontrolledFC,
+  type FunctionalManagerMethods,
+  type FunctionalMethods,
+  type MethodsStored,
+  type MethodsWithStore,
   type CustomComponentClass,
   type Methods,
   type MethodsWithInstance,
@@ -37,6 +42,7 @@ export {
   //HOCs
   createFormManager,
   createUncontrolledClassComponent,
+  createUncontrolledFC,
   //Hooks
   useEffectAsync,
   useIntervalEffect,
@@ -61,4 +67,8 @@ export {
   UncontrolledComponent,
   UncontrolledContext,
   UncontrolledContextValue,
+  FunctionalManagerMethods,
+  FunctionalMethods,
+  MethodsStored,
+  MethodsWithStore,
 };

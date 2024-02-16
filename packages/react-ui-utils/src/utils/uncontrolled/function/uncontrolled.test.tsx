@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { render, screen } from "@testing-library/react";
+import { act, render, screen } from "@testing-library/react";
 import "@testing-library/jest-dom";
 import { createUncontrolledFC, FunctionalManagerMethods } from ".";
 
@@ -9,7 +9,7 @@ interface IUncontrolledMethods {
 }
 
 const Example = ({ set }: FunctionalManagerMethods<IUncontrolledMethods>) => {
-  const [counter, setCounter] = useState(0);
+  const [counter, setCounter] = useState(1);
 
   set("getCounter", () => counter);
   set("setCounter", (newCounter) => setCounter(newCounter));
@@ -39,7 +39,19 @@ describe("render functionComponentManager", () => {
     const getCounter = manager.getCounter();
 
     setTimeout(() => {
-      expect(getCounter).toBe(0);
+      expect(getCounter).toBe(1);
+    }, 500);
+  });
+
+  it("should increment the counter state and return the current value", () => {
+    render(<manager.Component />);
+
+    act(() => manager.setCounter(10));
+
+    const currentValue = manager.getCounter();
+
+    setTimeout(() => {
+      expect(currentValue).toBe(10);
     }, 500);
   });
 });

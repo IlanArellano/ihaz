@@ -1,34 +1,32 @@
 {
-    "include": ["src"],
-    "exclude": ["lib", "node_modules"],
-    "compilerOptions": {
-      "jsx": "react",
-      "lib": ["dom", "esnext"],
-      "module": "esnext",
-      "esModuleInterop": true,
-      "baseUrl": "./src",
-      "target": "es5",
-      "outDir": "lib",
-      "paths": {
-        "@cache/*": ["*"]
-      },
-      "plugins": [
-        { "transform": "typescript-transform-paths" },
-        { "transform": "typescript-transform-paths", "afterDeclarations": true }
-      ],
-      "sourceMap": true,
-      "allowJs": false,
-      "declaration": true,
-      "moduleResolution": "node",
-      "forceConsistentCasingInFileNames": true,
-      "noImplicitReturns": true,
-      "noImplicitThis": true,
-      "noImplicitAny": true,
-      "strictNullChecks": true,
-      "suppressImplicitAnyIndexErrors": true,
-      "noUnusedLocals": true,
-      "noUnusedParameters": true,
-      "allowSyntheticDefaultImports": true
-    }
+  "include": ["src"],
+  "exclude": ["lib", "node_modules"],
+  "compilerOptions": {
+    "lib": ["dom", "esnext"],
+    "module": "esnext",
+    "esModuleInterop": true,
+    "baseUrl": "./src",
+    "target": "es5",
+    "outDir": "lib",
+    "paths": {
+      "@cache/*": ["*"]
+    },
+    "plugins": [
+      { "transform": "typescript-transform-paths" },
+      { "transform": "typescript-transform-paths", "afterDeclarations": true }
+    ],
+    "sourceMap": true,
+    "allowJs": false,
+    "declaration": true,
+    "moduleResolution": "node",
+    "forceConsistentCasingInFileNames": true,
+    "noImplicitReturns": true,
+    "noImplicitThis": true,
+    "noImplicitAny": true,
+    "strictNullChecks": true,
+    "suppressImplicitAnyIndexErrors": true,
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
+    "allowSyntheticDefaultImports": true
   }
-  
+}

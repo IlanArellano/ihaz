@@ -1,8 +1,11 @@
 import React, { forwardRef, type ComponentType, type FC } from "react";
-import { CommonObject } from "@ihaz/js-ui-utils";
 import type { ParametersWithoutFistParam, _Object } from "@utils/types";
 import type { MethodsStored, UncontrolledComponent } from "../shared/types";
-import type { FunctionalManagerMethods, FunctionalMethods } from "./types";
+import type {
+  FunctionalManagerMethods,
+  FunctionalMethodResult,
+  FunctionalMethods,
+} from "./types";
 
 interface ContextManager<IMethods extends FunctionalMethods<IMethods>, IProps> {
   Parent: ComponentType<IProps>;
@@ -56,19 +59,25 @@ const createFunctionalContextManager = <
   const getInstance = () => instance;
   const isInstanceMounted = () => !!instance;
 
-  const final = CommonObject.createObjectWithGetters(methods, (key, func) => {
-    const newFunc = (...args: ParametersWithoutFistParam<typeof func>) => {
-      if (!isInstanceMounted())
-        throw new Error("Component has not been initializated");
-      const currInstance = getInstance();
-      if (!currInstance![key])
-        throw new Error(
-          `Method ${String(key)} has no been setted from uncontrolled component`
-        );
-      return func(currInstance as IMethods, ...args);
-    };
-    return newFunc;
-  }) as unknown as MethodsStored<IMethods>;
+  const final = Object.fromEntries(
+    Object.entries(methods).map((entry) => {
+      const [key, func] = entry as [string, FunctionalMethodResult<IMethods>];
+      const newFunc = (...args: ParametersWithoutFistParam<typeof func>) => {
+        if (!isInstanceMounted())
+          throw new Error("Component has not been initializated");
+        const currInstance = getInstance();
+        if (!currInstance![key])
+          throw new Error(
+            `Method ${String(
+              key
+            )} has no been setted from uncontrolled component`
+          );
+        return func(currInstance as IMethods, ...args);
+      };
+      return [key, newFunc];
+    })
+  ) as MethodsStored<IMethods>;
+  console.log({ final, methods });
   return {
     Parent: () => {
       const handleRef = (x: Partial<IMethods> | null) => {

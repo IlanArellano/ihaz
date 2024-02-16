@@ -1,5 +1,10 @@
+export type FunctionalMethodResult<IMethods> = (
+  storeMethods: IMethods,
+  ...agrs: any[]
+) => any;
+
 export type FunctionalMethods<IMethods> = {
-  [key in keyof IMethods]: (storeMethods: IMethods, ...agrs: any[]) => any;
+  [key in keyof IMethods]: FunctionalMethodResult<IMethods>;
 };
 
 export interface FunctionalManagerMethods<IMethods> {
