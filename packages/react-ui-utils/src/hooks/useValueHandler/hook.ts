@@ -1,38 +1,22 @@
-import { useCallback, useImperativeHandle, useMemo, useRef } from "react";
-import { Execute, ValueHandler } from "@ihaz/js-ui-utils";
+import * as React from "react";
+import Execute from "@jsUtils/namespaces/execute";
+import ValueHandler from "@jsUtils/classes/ValueHandler";
 import { Value, ValueHandlerResult, ValueSetter } from "./types";
 
 const init = <IValue>(initial?: IValue) =>
   new ValueHandler(initial) as ValueHandler<IValue>;
 
-/**Hook that provides an uncontrolled internal state storing the value with ref, meaning the value handler never affects
- * the component lifecycle
- * ```tsx
- * const Example = () => {
- *const [counter, setCounter] = useValueHandler(0); // initial 0
- *
- *
- * const handleChange = () => {
- *  setCounter(prev => prev + 1); //increment
- * console.log(counter()) //value incremented synchronously
- *}
- *
- * return <button onChange={handleChange}>count: {counter()}</button> //Never changes till you change a state that modify the lifecycle component
- * }
- * ```
- *
- */
 export default function useValueHandler<IValue>(
   initial?: Value<IValue>
 ): ValueHandlerResult<IValue> {
-  const value = useRef<ValueHandler<IValue> | null>(null);
+  const value = React.useRef<ValueHandler<IValue> | null>(null);
 
-  const initialResolved = useMemo(
+  const initialResolved = React.useMemo(
     () => Execute.executeReturnedValue(initial),
     []
   );
 
-  useImperativeHandle(
+  React.useImperativeHandle(
     value,
     () => init(initialResolved) as ValueHandler<IValue>,
     []
@@ -43,9 +27,9 @@ export default function useValueHandler<IValue>(
       ? (value.current?.get() as IValue)
       : (initialResolved as IValue);
 
-  const get = useCallback(getCurrValue, []);
+  const get = React.useCallback(getCurrValue, []);
 
-  const set = useCallback(
+  const set = React.useCallback(
     (newValue: ValueSetter<IValue>, cb?: (value: IValue) => void) => {
       const final = Execute.executeReturnedValue(newValue, getCurrValue());
       value.current?.set(final);
@@ -54,7 +38,7 @@ export default function useValueHandler<IValue>(
     []
   );
 
-  const getDeepCopy = useCallback(
+  const getDeepCopy = React.useCallback(
     () => value.current?.getDeepCopy() as IValue,
     []
   );

@@ -1,6 +1,6 @@
-import React from "react";
+import * as React from "react";
 import "@testing-library/jest-dom";
-import { ViewManager } from "./create";
+import createViewManager from "./create";
 import ReactDOM from "react-dom/client";
 import { act } from "@testing-library/react";
 import { ViewProps } from "./types";
@@ -25,7 +25,7 @@ afterEach(() => {
 
 describe("render View to show components", () => {
   it("should render by show method", async () => {
-    const manager = ViewManager.createViewManager();
+    const manager = createViewManager();
     act(() => {
       ReactDOM.createRoot(container!).render(<manager.Component />);
     });
@@ -41,7 +41,7 @@ describe("render View to show components", () => {
   });
 
   it("should render by show sync method", () => {
-    const manager = ViewManager.createViewManager();
+    const manager = createViewManager();
     act(() => {
       ReactDOM.createRoot(container!).render(<manager.Component />);
     });

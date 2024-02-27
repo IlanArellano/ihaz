@@ -1,0 +1,1 @@
+export { CacheResource } from "./manager";

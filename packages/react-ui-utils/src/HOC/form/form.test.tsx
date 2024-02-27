@@ -1,8 +1,8 @@
-import React from "react";
+import * as React from "react";
 import "@testing-library/jest-dom";
 import ReactDOM from "react-dom/client";
 import { act } from "@testing-library/react";
-import { createFormManager } from ".";
+import createFormManager from "./main";
 
 let container: HTMLElement | null;
 beforeEach(() => {

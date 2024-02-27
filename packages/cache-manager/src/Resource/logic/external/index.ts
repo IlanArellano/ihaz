@@ -1,4 +1,4 @@
-import { Validation } from "@ihaz/js-ui-utils";
+import Validation from "@jsUtils/namespaces/validation";
 import {
   CacheConfigAsync,
   CacheStateProps,

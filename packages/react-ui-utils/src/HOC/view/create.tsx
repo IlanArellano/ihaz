@@ -1,8 +1,8 @@
-import React from "react";
+import * as React from "react";
 import { ViewManagerComponent } from "./manager";
 import { registerTreeComponent } from "./registerTreeComponent";
 import { ViewTree } from "./tree";
-import { createUncontrolledClassComponent } from "@utils/utils";
+import { ViewTree as ViewViewType } from "./types";
 import type {
   ConditionView,
   IViewManager,
@@ -10,49 +10,17 @@ import type {
   ShowFuncSync,
   ViewUncontrolledComp,
 } from "./types";
-import { CommonObject } from "@ihaz/js-ui-utils";
+import CommonObject from "@jsUtils/namespaces/object";
+import createUncontrolledClassComponent from "../class/comp";
 
 function createTree() {
   return new ViewTree();
 }
 
-/**Create a view manager that can handle the mount-unmount behavior from the own parent `Tree` component
-   * through the `show` and `onClose` methods. Every component is added
-   * to internal Parent component state, components inherit a prop called `onClose` when
-   * the method is called it will remove from the internal state, the method can also
-   * return a result when the component is closed
-   *
-   * ```tsx
-   * const manager = createViewManager();
-
-const ViewComponent = ({ onClose }: ViewProps<string>) => {
-  return (
-    <div>
-      <h1>View example</h1>
-      <button onClick={() => onClose("hello")}>Close</button>
-    </div>
-  );
-};
-
-const Example = () => {
-  const onShow = async () => {
-    const response = await manager.show(ViewComponent);
-    console.log(response); // Hello
-  };
-
-  return (
-    <div>
-      <button onClick={onShow}>Show</button>
-      <manager.Component />
-    </div>
-  );
-};
-
-   * 
-   * ```
-   */
 export default function createViewManager(): IViewManager {
-  const getTree = CommonObject.createGetterResource(createTree);
+  const getTree = CommonObject.createGetterResource(
+    createTree
+  ) as unknown as () => ViewViewType;
 
   const manager = createUncontrolledClassComponent(ViewManagerComponent, {
     show: (
@@ -62,9 +30,7 @@ export default function createViewManager(): IViewManager {
       context: Parameters<ShowFunc>[2]
     ) => {
       return new Promise((resolve) => {
-        instance()
-          .show(render, props, context)
-          .then((x) => resolve(x));
+        instance().show(render, props, context).then(resolve);
       });
     },
     showSync: (

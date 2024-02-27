@@ -1,5 +1,5 @@
-import { CommonObject } from "@ihaz/js-ui-utils";
-import CacheManager from "../cacheManager";
+import CommonObject from "@jsUtils/namespaces/object";
+import CacheManager from "../resource/cacheManager";
 import {
   CacheConfig,
   CacheResource,
@@ -8,7 +8,7 @@ import {
   NamedResource,
   Resource,
   ResourceCacheAction,
-} from "../types";
+} from "../resource/types";
 import { EMPTY_FUNCTION_CACHE } from "./context";
 import { cacheCall } from "./func";
 

@@ -1,4 +1,5 @@
-import { EventHandler, ValueHandler } from "@ihaz/js-ui-utils";
+import EventHandler from "@jsUtils/classes/EventHandler";
+import ValueHandler from "@jsUtils/classes/ValueHandler";
 import type {
   ComponentRegister,
   EventHandlerRegister,

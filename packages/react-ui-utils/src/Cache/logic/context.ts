@@ -1,4 +1,4 @@
-import { CommonObject } from "@ihaz/js-ui-utils";
+import CommonObject from "@jsUtils/namespaces/object";
 import {
   AppCacheAction,
   CacheEntry,
@@ -8,7 +8,7 @@ import {
   FunctionCache,
   FunctionCacheAction,
   ResourceCacheAction,
-} from "../types";
+} from "../resource/types";
 
 export const EMPTY_FUNCTION_CACHE: FunctionCache = { entries: [] };
 

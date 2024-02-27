@@ -1,5 +1,5 @@
-import { Stack } from "@ihaz/js-ui-utils";
-import React, { PureComponent } from "react";
+import * as React from "react";
+import Stack from "@jsUtils/namespaces/stack";
 import { ViewMainComponent } from "./comp";
 import { VIEW_TREE_EVENT } from "./tree";
 import type {
@@ -12,7 +12,7 @@ import type {
   ViewManagerComponentProps,
 } from "./types";
 
-export class ViewManagerComponent extends PureComponent<
+export class ViewManagerComponent extends React.PureComponent<
   ViewManagerComponentProps,
   ViewComponentProps
 > {

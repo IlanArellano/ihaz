@@ -1,3 +1,7 @@
-export { EventHandler, type EventsList, type EventsMap } from "./EventHandler";
-export { IntervalHandler } from "./IntervalHandler";
-export { ValueHandler, BaseHandler } from "./ValueHandler";
+export {
+  default as EventHandler,
+  type EventsList,
+  type EventsMap,
+} from "./EventHandler";
+export { default as IntervalHandler } from "./IntervalHandler";
+export { default as ValueHandler, BaseHandler } from "./ValueHandler";

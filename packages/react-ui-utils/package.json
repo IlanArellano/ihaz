@@ -1,36 +1,15 @@
 {
   "name": "@ihaz/react-ui-utils",
-  "version": "1.4.0",
-  "description": "A cross-platform general UI common methods for React Projects",
+  "version": "1.4.0-beta",
   "type": "module",
-  "main": "lib/index.js",
-  "module": "lib/index.es.js",
-  "jsnext:main": "lib/index.es.js",
-  "files": [
-    "lib"
-  ],
   "engines": {
-    "node": ">=14.0.0"
+    "node": ">=16"
   },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/IlanArellano/ihaz.git"
-  },
-  "scripts": {
-    "build": "rollup -c",
-    "test": "jest --watchAll"
-  },
-  "keywords": [
-    "react",
-    "react-utils",
-    "react native"
-  ],
-  "author": "Ilan Arellano",
-  "license": "MIT",
   "peerDependencies": {
     "react": ">=16"
   },
-  "dependencies": {
-    "@ihaz/js-ui-utils": "^1.0.4-alpha"
+  "scripts": {
+    "build": "set NODE_ENV=production&& set INPUT_DIR=src/&& set OUTPUT_DIR=lib/&& rollup -c && gulp copy-files",
+    "test": "jest --watchAll"
   }
 }

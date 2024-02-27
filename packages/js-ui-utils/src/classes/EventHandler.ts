@@ -7,7 +7,7 @@ export interface EventsList<IEvent extends keyof EventsMap<string>> {
   callback: EventsMap<string>[IEvent];
 }
 
-export class EventHandler<
+export default class EventHandler<
   IEvents extends EventsMap<Extract<keyof IEvents, string>>
 > {
   private list: EventsList<Extract<keyof IEvents, string>>[];

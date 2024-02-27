@@ -1,9 +1,9 @@
-import { DeepRecord, _Object } from "@utils/types";
-import { Client } from "./client";
+import { DeepRecord, _Object } from "../types";
+import Client from "./client";
 
 type MapObjectOut<T, TOut> = { [K in keyof T]: TOut };
 
-export namespace CommonObject {
+namespace CommonObject {
   export const Omit = <T extends { [k: string]: any }, K extends keyof T>(
     obj: T,
     ...omits: K[]
@@ -45,7 +45,9 @@ export namespace CommonObject {
     Object.keys(obj).forEach((key) => {
       Object.defineProperty(newObj, key, {
         get: () =>
-          hasExcluded && excludedKeys[key] ? obj[key] : get(key, obj[key]),
+          hasExcluded && excludedKeys.some((x) => x === key)
+            ? obj[key]
+            : get(key, obj[key]),
       });
     });
 
@@ -57,7 +59,7 @@ export namespace CommonObject {
     IResult extends T extends (...args: any[]) => infer Res ? Res : never
   >(
     func: T
-  ): ((...args: any[]) => IResult) => {
+  ): ((...args: Parameters<T>) => IResult) => {
     let value: IResult | null = null;
     return function () {
       if (value === null) {
@@ -160,3 +162,5 @@ export namespace CommonObject {
     return JSON.stringify(obj) === "{}";
   };
 }
+
+export default CommonObject;

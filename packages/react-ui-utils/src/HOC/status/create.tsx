@@ -1,25 +1,20 @@
-import React, { type ComponentType } from "react";
-import { CommonObject, EventHandler } from "@ihaz/js-ui-utils";
-import { createUncontrolledClassComponent } from "@utils/utils";
-import StatusManagerClass, { StatusManagerProps } from "./manager";
-import type { StatusEventsMapping } from "./types";
-
-interface WithStatusResult<IProps> {
-  Component: ComponentType<IProps>;
-  addEventListener: <
-    IKeyEvents extends Extract<keyof StatusEventsMapping, string>
-  >(
-    id: IKeyEvents,
-    callback: StatusEventsMapping[IKeyEvents]
-  ) => void;
-}
+import * as React from "react";
+import CommonObject from "@jsUtils/namespaces/object";
+import EventHandler from "@jsUtils/classes/EventHandler";
+import StatusManagerClass from "./manager";
+import type {
+  StatusEventsMapping,
+  StatusManagerProps,
+  WithStatusResult,
+} from "./types";
+import createUncontrolledClassComponent from "../class/comp";
 
 function createStatusEvent() {
   return new EventHandler<StatusEventsMapping>();
 }
 
 export default function withStatus<IProps = any>(
-  Comp: ComponentType<IProps>
+  Comp: React.ComponentType<IProps>
 ): WithStatusResult<IProps> {
   const getEvents = CommonObject.createGetterResource(createStatusEvent);
 
@@ -37,6 +32,7 @@ export default function withStatus<IProps = any>(
 
   return {
     Component: (props: IProps & Pick<StatusManagerProps, "internalKey">) => (
+      /* @ts-ignore */
       <manager.Component internalKey={props.internalKey} getEvents={getEvents}>
         <Comp {...props} />
       </manager.Component>

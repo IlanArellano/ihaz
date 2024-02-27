@@ -8,7 +8,7 @@ import {
   type SingleCacheResult,
 } from "../types";
 import { getManagerContext } from "./manager";
-import { CommonObject } from "@ihaz/js-ui-utils";
+import CommonObject from "@jsUtils/namespaces/object";
 
 export const createNode = <
   T extends ResourceFunction

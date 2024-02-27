@@ -15,3 +15,5 @@ namespace CommonArray {
     return false;
   };
 }
+
+export default CommonArray;

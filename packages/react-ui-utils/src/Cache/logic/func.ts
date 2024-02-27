@@ -1,4 +1,5 @@
-import { CommonObject, Validation } from "@ihaz/js-ui-utils";
+import CommonObject from "@jsUtils/namespaces/object";
+import Validation from "@jsUtils/namespaces/validation";
 import {
   CacheEntry,
   CachePayload,
@@ -6,7 +7,7 @@ import {
   FunctionCache,
   FunctionCacheAction,
   JSONValue,
-} from "../types";
+} from "../resource/types";
 
 function syncCacheCall(
   cache: FunctionCache,

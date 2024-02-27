@@ -1,4 +1,4 @@
-import { CommonObject } from "@ihaz/js-ui-utils";
+import CommonObject from "@jsUtils/namespaces/object";
 import { SingleCacheManager } from "../types";
 import { CacheEnvironment } from "@cache/Resource/types";
 

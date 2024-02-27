@@ -1,43 +1,20 @@
-import { EventHandler, EventsMap } from "@ihaz/js-ui-utils";
-import { useCallback, useImperativeHandle, useRef } from "react";
+import * as React from "react";
+import EventHandler, { EventsMap } from "@jsUtils/classes/EventHandler";
 import { HandleEvents } from "./types";
 
-/**
- * Hook that executes a callback suscribing to one or several events into a component
- * ```tsx
- * const Example = () => {
-    const { addEventListenner, removeEventListenner, listen } = useEventHandler<"change", string>();
-
-    useEffect(() => {
-      const listenner = (result: string) => {
-        console.log("result: ", result)
-      };
-      addEventListenner("change", listenner); // Suscribing callback to Change event
-
-      return () => {
-        removeEventListenner("change", listenner); // Unsuscribing callback to Change event
-      }
-    },[]);
-
-    const handleFetch = async () => {
-      const res = await fetch("myapi");
-      listen("change", await res.text()) // Listen Change event
-    }
-
-    return <button onClick={handleFetch}>Fetch</button>
-  }
-
- * ```
- */
 export default function useEventHandler<
   Mapping extends EventsMap<string> = any
 >(): HandleEvents<Extract<keyof Mapping, string>> {
   type IKeys = Extract<keyof Mapping, string>;
-  const eventHandler = useRef<EventHandler<Mapping> | null>(null);
+  const eventHandler = React.useRef<EventHandler<Mapping> | null>(null);
 
-  useImperativeHandle(eventHandler, () => new EventHandler<Mapping>(), []);
+  React.useImperativeHandle(
+    eventHandler,
+    () => new EventHandler<Mapping>(),
+    []
+  );
 
-  const addEventListenner = useCallback(
+  const addEventListenner = React.useCallback(
     <Key extends IKeys>(event: Key, fn: EventsMap<IKeys>[IKeys]) => {
       if (eventHandler.current?.isSuscribed(event, fn)) return;
       eventHandler.current?.suscribe(event, fn);
@@ -45,14 +22,14 @@ export default function useEventHandler<
     []
   );
 
-  const removeEventListenner = useCallback(
+  const removeEventListenner = React.useCallback(
     <Key extends IKeys>(event: Key, fn: EventsMap<IKeys>[IKeys]) => {
       eventHandler.current?.clear(event, fn);
     },
     []
   );
 
-  const listen = useCallback(
+  const listen = React.useCallback(
     <Key extends IKeys>(
       event: Key,
       ...restValues: Parameters<EventsMap<IKeys>[Key]>
@@ -62,11 +39,11 @@ export default function useEventHandler<
     []
   );
 
-  const listenAll = useCallback(() => {
+  const listenAll = React.useCallback(() => {
     eventHandler.current?.listenAll();
   }, []);
 
-  const clearAll = useCallback(() => {
+  const clearAll = React.useCallback(() => {
     eventHandler.current?.clearAll();
   }, []);
 

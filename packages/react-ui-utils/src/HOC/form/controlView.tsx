@@ -1,14 +1,14 @@
-import React, { forwardRef, useMemo } from "react";
-import { CommonObject, Client } from "@ihaz/js-ui-utils";
+import * as React from "react";
+import { CommonObject, Client } from "@jsUtils/namespaces";
 import { Form, Input } from "./FormComp";
 import type { FieldProps, FormProps } from "./types";
 
-export const ControlView = forwardRef<
+export const ControlView = React.forwardRef<
   any,
   FieldProps<{ [k: string]: any }, any>
 >((props, ref) => {
   const Component = props.render;
-  const CompProps = useMemo(
+  const CompProps = React.useMemo(
     () => CommonObject.Omit(props, "field", "render", "value", "onChange"),
     [props]
   );
@@ -31,17 +31,17 @@ export const ControlView = forwardRef<
   );
 });
 
-export const ControlForm = forwardRef<
+export const ControlForm = React.forwardRef<
   any,
   FormProps<any, { [k: string]: any }>
 >((props, ref) => {
   const Component = props.render;
-  const CompProps = useMemo(
+  const CompProps = React.useMemo(
     () => CommonObject.Omit(props, "field", "render", "value", "onChange"),
     [props]
   );
 
-  const isClient = useMemo(() => Client.isClientSide(), []);
+  const isClient = React.useMemo(() => Client.isClientSide(), []);
 
   if (!Component) {
     if (isClient) return <Form {...CompProps} ref={ref} />;

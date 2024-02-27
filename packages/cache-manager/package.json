@@ -1,6 +1,6 @@
 {
   "name": "@ihaz/cache-manager",
-  "version": "1.0.0",
+  "version": "1.0.0-alpha",
   "description": "A cache manager which store items and resources in memory or storage manager",
   "type": "module",
   "main": "lib/index.js",
@@ -24,8 +24,5 @@
     "cache"
   ],
   "author": "Ilan Arellano",
-  "license": "MIT",
-  "dependencies": {
-    "@ihaz/js-ui-utils": "^1.0.4-alpha"
-  }
+  "license": "MIT"
 }

@@ -1,14 +1,18 @@
-import { CommonObject } from "@utils/namespaces";
+import CommonObject from "../namespaces/object";
 
 export abstract class BaseHandler<T> {
   protected abstract value: T;
 
+  /**
+   * @deprecated
+   *
+   */
   getDeepCopy() {
     return CommonObject.DeepCopy(this.value);
   }
 }
 
-export class ValueHandler<T> extends BaseHandler<T> {
+export default class ValueHandler<T> extends BaseHandler<T> {
   protected value: T;
 
   constructor(initial: T) {

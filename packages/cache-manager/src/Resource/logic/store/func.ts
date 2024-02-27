@@ -1,4 +1,4 @@
-import { CommonObject } from "@ihaz/js-ui-utils";
+import CommonObject from "@jsUtils/namespaces/object";
 import {
   CacheConfig,
   CacheStateProps,

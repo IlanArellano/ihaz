@@ -1,16 +1,7 @@
-import React, {
-  createContext,
-  createRef,
-  forwardRef,
-  PropsWithChildren,
-  PureComponent,
-  RefObject,
-  useContext,
-  useEffect,
-  useMemo,
-  useState,
-} from "react";
-import { CommonObject, EventHandler, ValueHandler } from "@ihaz/js-ui-utils";
+import * as React from "react";
+import EventHandler from "@jsUtils/classes/EventHandler";
+import ValueHandler from "@jsUtils/classes/ValueHandler";
+import CommonObject from "@jsUtils/namespaces/object";
 import { ControlForm, ControlView } from "./controlView";
 import {
   FieldProps,
@@ -55,46 +46,6 @@ const CheckValidation = <T,>(
     return v === true;
   });
 
-/**
- * @experimental
- * Returns a Form enviroment that provides a `Form` component that can be used and handled by internal state using a `Field`
- * component that can change every prop from the state
- * @param initial Initial value state
- * @param validation A callback collection that evaluate a validation to every prop of the state 
- *
- * ```tsx
- * const initial = {
-  name: "",
-  lastName: "",
-  age: 0,
-  birthAge: new Date(),
-};
-
-const { Form, Field, Submit, useFormValue } = createFormManager(initial, {
-  name: (value) => value.length > 10, // Validation for the name
-});
- *const Component = () => {
-  const { value, isValidated } = useFormValue();
-
-  const onSubmit = (result: typeof initial) => {
-    console.log(result); // Current state of form value
-    //...
-  };
-
-  return (
-    <Form onSubmit={onSubmit}>
-      <Field field="name" />
-      <Field field="lastName" />
-      <Field field="birthAge" />
-      <Field field="age" />
-      <Submit>
-        <button type="submit">submit</button>
-      </Submit>
-    </Form>
-  );
-};
- * ```
- */
 export default function createFormManager<T extends { [key: string]: any }>(
   initial: T,
   validation?: Validation<T>
@@ -123,7 +74,7 @@ export default function createFormManager<T extends { [key: string]: any }>(
     validationResolved: {},
   };
 
-  const FormCxt = createContext<FormContext<T>>(
+  const FormCxt = React.createContext<FormContext<T>>(
     initialFormCtx as FormContext<T>
   );
 
@@ -131,11 +82,11 @@ export default function createFormManager<T extends { [key: string]: any }>(
     TProps extends {
       [k: string]: any;
     } = React.FormHTMLAttributes<HTMLFormElement>
-  > extends PureComponent<
+  > extends React.PureComponent<
     FormProps<T, TProps>,
     { value: T; validationResolved: ValidationResolve<T> }
   > {
-    private formRef: RefObject<T>;
+    private formRef: React.RefObject<T>;
     constructor(props: FormProps<T, TProps>) {
       super(props);
       this.state = {
@@ -144,7 +95,7 @@ export default function createFormManager<T extends { [key: string]: any }>(
           ? CommonObject.ChangeValueFromObject(validation as T, false, true)
           : {},
       };
-      this.formRef = createRef();
+      this.formRef = React.createRef();
     }
 
     handleChange = <Key extends keyof T>(field: Key, value: T[Key]) => {
@@ -198,10 +149,10 @@ export default function createFormManager<T extends { [key: string]: any }>(
     }
   }
 
-  function Submit({ children }: PropsWithChildren) {
-    const formCtx = useContext(FormCxt);
+  function Submit({ children }: React.PropsWithChildren) {
+    const formCtx = React.useContext(FormCxt);
 
-    const _eval = useMemo(
+    const _eval = React.useMemo(
       () => CheckValidation(formCtx.validationResolved),
       [formCtx.validationResolved]
     );
@@ -215,13 +166,13 @@ export default function createFormManager<T extends { [key: string]: any }>(
       [k: string]: any;
     } = React.InputHTMLAttributes<HTMLInputElement>
   >(props: FieldProps<TProps, T>, ref: React.ForwardedRef<any>) {
-    const formctx = useContext(FormCxt);
+    const formctx = React.useContext(FormCxt);
     if (formctx === undefined)
       throw new Error(
         "<Field> Component only can be rendered by <Form> Component from the HOC call"
       );
 
-    useEffect(() => {
+    React.useEffect(() => {
       _field_register.set(_field_register.get().concat(props.field));
       if (_field_register.get().filter((x) => x === props.field).length > 1) {
         console.warn(
@@ -256,7 +207,7 @@ export default function createFormManager<T extends { [key: string]: any }>(
     );
   }
 
-  const Field = forwardRef(
+  const Field = React.forwardRef(
     FieldComp as <
       TProps extends {
         [k: string]: any;
@@ -267,13 +218,13 @@ export default function createFormManager<T extends { [key: string]: any }>(
   ) as FormManager<T>["Field"];
 
   function useFormValue() {
-    const { value: FormValue, itemManager } = useContext(FormCxt);
-    const [value, setValue] = useState<FormValueStateResolved<T>>(() => ({
+    const { value: FormValue, itemManager } = React.useContext(FormCxt);
+    const [value, setValue] = React.useState<FormValueStateResolved<T>>(() => ({
       value: FormValue,
       isValidated: undefined,
     }));
 
-    useEffect(() => {
+    React.useEffect(() => {
       const listenner = (state: FormValueState<T>) => {
         const validated = CheckValidation(state.isValidated);
         setValue({

@@ -1,4 +1,4 @@
-import React from "react";
+import * as React from "react";
 import type { ViewComponentProps } from "./types";
 
 export function ViewMainComponent(props: ViewComponentProps) {

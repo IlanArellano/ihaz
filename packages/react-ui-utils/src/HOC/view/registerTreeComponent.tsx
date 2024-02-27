@@ -1,7 +1,5 @@
-import React, { useEffect } from "react";
-import { ViewTree } from "./tree";
-import { _Object } from "@utils/types";
-import { TreeComponent } from "./types";
+import * as React from "react";
+import type { TreeComponent, ViewTree } from "./types";
 
 export const registerTreeComponent =
   (getTree: () => ViewTree): TreeComponent =>
@@ -11,7 +9,7 @@ export const registerTreeComponent =
         "No contextName has provider for this register, this must have a unique identifier to manage the views binding to context"
       );
     return (props) => {
-      useEffect(() => {
+      React.useEffect(() => {
         const tree = getTree();
         tree.registerComponent({
           key: contextName,
