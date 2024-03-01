@@ -5,15 +5,39 @@ declare type ParametersWithoutFistParam<T extends (...args: any[]) => any> =
 
 export declare type _Object = { [key: string]: any };
 
+export type UncontrolledFC = <
+  IComponent extends (props: P) => React.ReactNode,
+  IMethods = IComponent extends (props: infer IProps) => React.ReactNode
+    ? IProps extends FunctionalManagerMethods<infer Methods>
+      ? Methods
+      : {}
+    : {},
+  P = IComponent extends (props: infer IProps) => React.ReactNode
+    ? Omit<IProps, keyof FunctionalManagerMethods<any>>
+    : {}
+>(
+  Comp: IComponent,
+  override?: MethodsWithStore<
+    IMethods extends FunctionalMethods ? IMethods : {}
+  >
+) => { methods: IMethods } & Omit<UncontrolledComponent<P>, "getStore">;
+
 export type MethodsWithInstance<IComponent> = {
   [key: string]: (instance: () => IComponent, ...agrs: any[]) => any;
 };
-export type MethodsWithStore<IStore> = {
+export type MethodsWithStore<IStore extends FunctionalMethods> = {
   [key: string]: (
     get: <IKey extends keyof IStore>(key: IKey) => IStore[IKey],
     ...agrs: any[]
   ) => any;
 };
+
+export interface ContextManager<IMethods extends FunctionalMethods, IProps> {
+  Parent: React.ComponentType<IProps>;
+  isInstanceMounted: () => boolean;
+  managerMethods: IMethods;
+}
+
 export type Methods<
   IComponent,
   IMethodInstance extends MethodsWithInstance<IComponent>
@@ -32,7 +56,7 @@ export type MethodsStored<
 };
 
 export type UncontrolledComponent<P = {}> = {
-  Component: ComponentType<P>;
+  Component: (props: P) => React.ReactNode;
   isInstanceMounted: () => boolean;
   getStore: () => _Object | undefined;
 };
@@ -47,25 +71,14 @@ export type FunctionalMethodResult<IMethods> = (
   ...agrs: any[]
 ) => any;
 
-export type FunctionalMethods<IMethods> = {
-  [key in keyof IMethods]: FunctionalMethodResult<IMethods>;
+export type FunctionalMethods = {
+  [key: string]: (...args: any[]) => any;
 };
 
-export interface FunctionalManagerMethods<IMethods> {
+export interface FunctionalManagerMethods<IMethods extends FunctionalMethods> {
   set: <IKey extends keyof IMethods>(key: IKey, value: IMethods[IKey]) => void;
 }
 
-export default function createUncontrolledFC<
-  IComponent extends FC<P>,
-  IMethods extends _Object,
-  P = IComponent extends FC<FunctionalManagerMethods<IMethods> & infer IProps>
-    ? IProps
-    : {}
->(
-  Comp: IComponent,
-  methods: FunctionalMethods<IMethods>
-): MethodsStored<any> &
-  Omit<
-    UncontrolledComponent<Omit<P, keyof FunctionalManagerMethods<IMethods>>>,
-    "getStore"
-  >;
+declare const createUncontrolledFC: UncontrolledFC;
+
+export default createUncontrolledFC;

@@ -37,21 +37,22 @@ namespace CommonObject {
   export const createObjectWithGetters = <T extends { [key: string]: any }>(
     obj: T,
     get: (key: keyof T, value: T[keyof T]) => any,
-    excludedKeys?: (keyof T)[]
+    excludedKeys?: (keyof T)[],
+    mutable?: boolean
   ): T => {
-    const newObj = {} as T;
+    const finalObj = mutable ? obj : ({} as T);
     const hasExcluded = Array.isArray(excludedKeys);
 
-    Object.keys(obj).forEach((key) => {
-      Object.defineProperty(newObj, key, {
+    for (let key in obj) {
+      Object.defineProperty(finalObj, key, {
         get: () =>
           hasExcluded && excludedKeys.some((x) => x === key)
             ? obj[key]
             : get(key, obj[key]),
       });
-    });
+    }
 
-    return newObj;
+    return finalObj;
   };
 
   export const createGetterResource = <

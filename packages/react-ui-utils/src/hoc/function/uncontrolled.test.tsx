@@ -4,10 +4,10 @@ import createUncontrolledFC from "./comp";
 import "@testing-library/jest-dom";
 import type { FunctionalManagerMethods } from "./types";
 
-interface IUncontrolledMethods {
+type IUncontrolledMethods = {
   getCounter: () => number;
   setCounter: (counter: number) => void;
-}
+};
 
 const Example = ({ set }: FunctionalManagerMethods<IUncontrolledMethods>) => {
   const [counter, setCounter] = useState(1);
@@ -19,16 +19,7 @@ const Example = ({ set }: FunctionalManagerMethods<IUncontrolledMethods>) => {
 };
 
 describe("render functionComponentManager", () => {
-  const manager = createUncontrolledFC(Example, {
-    setCounter: (get, newCounter) => {
-      const setCounter = get("setCounter");
-      return setCounter(newCounter);
-    },
-    getCounter: (get) => {
-      const getCounter = get("getCounter");
-      return getCounter();
-    },
-  });
+  const manager = createUncontrolledFC(Example);
 
   it("should render by default", () => {
     render(<manager.Component />);
@@ -39,7 +30,7 @@ describe("render functionComponentManager", () => {
   it("should method getCounter return a number", () => {
     render(<manager.Component />);
 
-    const getCounter = manager.getCounter();
+    const getCounter = manager.methods.getCounter();
 
     setTimeout(() => {
       expect(getCounter).toBe(1);
@@ -49,9 +40,9 @@ describe("render functionComponentManager", () => {
   it("should increment the counter state and return the current value", () => {
     render(<manager.Component />);
 
-    act(() => manager.setCounter(10));
+    act(() => manager.methods.setCounter(10));
 
-    const currentValue = manager.getCounter();
+    const currentValue = manager.methods.getCounter();
 
     setTimeout(() => {
       expect(currentValue).toBe(10);
