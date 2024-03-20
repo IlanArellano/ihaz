@@ -12,7 +12,7 @@ import {
   createUncontrolledClassComponent,
   createUncontrolledFC,
 } from "./hoc";
-import { CacheResource } from "./Cache";
+import { CacheResource } from "./cache";
 
 export {
   //Namespaces
@@ -21,7 +21,6 @@ export {
   createFormManager,
   createViewManager,
   withStatus,
-  //Utils
   createUncontrolledClassComponent,
   createUncontrolledFC,
   //Hooks

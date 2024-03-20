@@ -1,16 +1,20 @@
 import * as React from "react";
 import EventHandler, { EventsMap } from "@jsUtils/classes/EventHandler";
-import { HandleEvents } from "./types";
+import { EventHandlerOptions, HandleEvents } from "./types";
 
 export default function useEventHandler<
   Mapping extends EventsMap<string> = any
->(): HandleEvents<Extract<keyof Mapping, string>> {
+>(options?: EventHandlerOptions): HandleEvents<Extract<keyof Mapping, string>> {
   type IKeys = Extract<keyof Mapping, string>;
   const eventHandler = React.useRef<EventHandler<Mapping> | null>(null);
 
   React.useImperativeHandle(
     eventHandler,
-    () => new EventHandler<Mapping>(),
+    () => {
+      const handler = new EventHandler<Mapping>();
+      if (options) handler.setOptions(options);
+      return handler;
+    },
     []
   );
 

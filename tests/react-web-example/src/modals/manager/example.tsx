@@ -2,13 +2,16 @@ import React from "react";
 import ModalBase from "../base";
 import { ViewProps } from "@ihaz/react-ui-utils/hoc/view";
 
-interface ExampleManagerModalProps extends ViewProps<boolean> {}
+interface ExampleManagerModalProps extends ViewProps<boolean> {
+  hideComponent: () => void;
+}
 
 export default function ExampleManagerModal({
   onClose,
+  hideComponent,
 }: ExampleManagerModalProps) {
   return (
-    <ModalBase onClose={onClose}>
+    <ModalBase onClose={onClose} defaultResult={false}>
       <p className="m-0">
         Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod
         tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim
@@ -18,6 +21,7 @@ export default function ExampleManagerModal({
         occaecat cupidatat non proident, sunt in culpa qui officia deserunt
         mollit anim id est laborum.
       </p>
+      <button onClick={hideComponent}>Hide</button>
     </ModalBase>
   );
 }

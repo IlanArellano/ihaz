@@ -2,6 +2,10 @@ declare type EventsMap<IEvents extends string> = {
   [IEvent in IEvents]: (...args: any[]) => void;
 };
 
+export type EventHandlerOptions = Partial<{
+  callPreviousListener: boolean;
+}>;
+
 export interface HandleEvents<IEvents extends string> {
   addEventListenner: (event: IEvents, fn: EventsMap<string>[IEvents]) => void;
   removeEventListenner: (

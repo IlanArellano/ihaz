@@ -11,6 +11,8 @@ export default function Home() {
         <section>
           <Link href="/manager">View Manager</Link>
           <Link href="/uncontrolled">Uncontrolled Components</Link>
+          <Link href="/status">Status</Link>
+          <Link href="/hooks">Hooks</Link>
         </section>
       </article>
     </Main>

@@ -1,5 +1,71 @@
-import EventHandler from "@jsUtils/classes/EventHandler";
-import { ComponentType, ReactElement } from "react";
+export declare type EventsMap<IEvents extends string> = {
+  [IEvent in IEvents]: (...args: any[]) => void;
+};
+
+export interface EventsList<IEvent extends keyof EventsMap<string>> {
+  id: IEvent;
+  callback: EventsMap<string>[IEvent];
+}
+
+export type EventHandlerOptions = Partial<{
+  callPreviousListener: boolean;
+}>;
+
+export declare class EventHandler<
+  IEvents extends EventsMap<Extract<keyof IEvents, string>>
+> {
+  private list: EventsList<Extract<keyof IEvents, string>>[];
+  private options: EventHandlerOptions;
+  private eventArgs: Map<
+    Extract<keyof IEvents, string>,
+    Parameters<EventsMap<string>[Extract<keyof IEvents, string>]>
+  >;
+
+  private _init(): void;
+
+  public setOptions(options: EventHandlerOptions): this;
+
+  private checkCallback(callback: Function): boolean;
+
+  public suscribe<IKeyEvents extends Extract<keyof IEvents, string>>(
+    id: IKeyEvents,
+    callback: EventsMap<string>[IKeyEvents]
+  ): void;
+
+  public isAnyEventSuscribed(): boolean;
+
+  public isSuscribed<IKeyEvents extends Extract<keyof IEvents, string>>(
+    id: IKeyEvents,
+    callback: EventsMap<string>[IKeyEvents]
+  ): boolean;
+
+  public isSuscribedByEvent<IKeyEvents extends Extract<keyof IEvents, string>>(
+    id: IKeyEvents
+  ): boolean;
+
+  public listen<IKeyEvents extends Extract<keyof IEvents, string>>(
+    id: IKeyEvents,
+    ...restValues: Parameters<EventsMap<string>[IKeyEvents]>
+  ): void;
+
+  private executeEvent<IKeyEvents extends Extract<keyof IEvents, string>>(
+    id: string,
+    ...restValues: Parameters<EventsMap<string>[IKeyEvents]>
+  ): void;
+
+  listenAll(): void;
+
+  public clear<IKeyEvents extends Extract<keyof IEvents, string>>(
+    id: IKeyEvents,
+    callback: EventsMap<string>[IKeyEvents]
+  ): void;
+
+  public clearByEvent<IKeyEvents extends Extract<keyof IEvents, string>>(
+    id: IKeyEvents
+  ): void;
+
+  public clearAll(): void;
+}
 
 declare abstract class BaseHandler<T> {
   protected abstract value: T;
@@ -37,7 +103,7 @@ export class ViewTree {
 export declare type _Object = { [key: string]: any };
 
 declare type UncontrolledComponent<P = {}> = {
-  Component: (props: P) => ReactElement<P>;
+  Component: (props: P) => React.ReactElement<P>;
   isInstanceMounted: () => boolean;
   getStore: () => _Object | undefined;
 };
@@ -104,7 +170,7 @@ export interface ViewUncontrolledComp
 }
 
 export interface ViewMethods {
-  Component: () => ReactElement;
+  Component: () => React.ReactElement;
   getTree: () => ViewTree;
   withViewContext: TreeComponent;
 }
@@ -112,10 +178,10 @@ export interface ViewMethods {
 export declare type IViewManager = Omit<ViewUncontrolledComp, "Component"> &
   ViewMethods;
 
-export declare type TreeComponent = <T extends _Object>(
-  ComponentWithRef: ComponentType<T>,
+export declare type TreeComponent = <IProps = any>(
+  ComponentWithRef: React.ComponentType<IProps>,
   contextName: string
-) => ComponentType<T>;
+) => (props: IProps) => React.ReactElement;
 
 export declare type Status = "mounted" | "unmounted";
 

@@ -21,6 +21,6 @@ export const registerTreeComponent =
         };
       }, []);
 
-      return <ComponentWithRef {...props} />;
+      return <ComponentWithRef {...(props as any)} />;
     };
   };

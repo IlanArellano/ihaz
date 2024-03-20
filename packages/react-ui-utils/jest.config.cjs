@@ -7,5 +7,6 @@ module.exports = {
   setupFilesAfterEnv: ["@testing-library/jest-dom/extend-expect"],
   moduleNameMapper: {
     "@utils/(.*)": "<rootDir>/src/$1",
+    "@jsUtils/(.*)": "<rootDir>/../js-ui-utils/src/$1",
   },
 };

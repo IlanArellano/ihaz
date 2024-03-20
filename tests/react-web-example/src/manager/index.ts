@@ -18,22 +18,5 @@ export namespace HOC {
 
   export const Form = createFormManager(INITIAL_FORM);
 
-  export const UncontrolledFC = createUncontrolledFC(UncontrolledFunction, {
-    get: (get) => {
-      const getCounter = get("get");
-      return getCounter();
-    },
-    increment: (get) => {
-      const incrementValue = get("increment");
-      return incrementValue();
-    },
-    decrement: (get) => {
-      const dercrementValue = get("decrement");
-      return dercrementValue();
-    },
-    toogle: (get, state) => {
-      const toogleState = get("toogle");
-      return toogleState(state);
-    },
-  });
+  export const UncontrolledFC = createUncontrolledFC(UncontrolledFunction);
 }

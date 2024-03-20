@@ -56,10 +56,13 @@ export class ViewTree {
     this.components.set(comp.concat(entry));
     if (this.componentMountEvents) {
       this.componentMountEvents.set(
-        this.componentMountEvents.get().concat({
-          key: entry.key,
-          event: new EventHandler<EventHandlerRegisterMapping>(),
-        })
+        this.componentMountEvents.get().concat([
+          {
+            key: entry.key,
+            /* @ts-ignore */
+            event: new EventHandler<EventHandlerRegisterMapping>(),
+          },
+        ])
       );
     }
   }

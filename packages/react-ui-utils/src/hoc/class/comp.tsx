@@ -89,7 +89,6 @@ export default function createUncontrolledClassComponent<
         const message =
           "Component instance has been declare more than once in React Tree";
         if (strictMode) throw new Error(message);
-        else console.warn(message);
       }
       return () => {
         mounted_instances--;

@@ -1,15 +1,14 @@
 import { HOC } from "@app/manager";
-import React from "react";
 
 export default function ControlledFunctionComp() {
   const increment = () => {
-    HOC.UncontrolledFC.increment();
+    HOC.UncontrolledFC.methods.increment();
   };
   const decrement = () => {
-    HOC.UncontrolledFC.decrement();
+    HOC.UncontrolledFC.methods.decrement();
   };
   const toogle = (state: boolean) => {
-    HOC.UncontrolledFC.toogle(state);
+    HOC.UncontrolledFC.methods.toogle(state);
   };
   return (
     <div>

@@ -1,9 +1,5 @@
 import * as React from "react";
-import type {
-  ReactKey,
-  StatusEventsMapping,
-  StatusManagerProps,
-} from "./types";
+import type { ReactKey, StatusManagerProps } from "./types";
 
 let StatusManagerRenderCount: number = 0;
 
@@ -16,7 +12,7 @@ function increment(maxValue?: number) {
 }
 
 function decrement() {
-  if (++StatusManagerRenderCount <= 0) StatusManagerRenderCount = 0;
+  if (--StatusManagerRenderCount <= 0) StatusManagerRenderCount = 0;
 }
 
 export default class StatusManagerClass extends React.PureComponent<
@@ -40,13 +36,6 @@ export default class StatusManagerClass extends React.PureComponent<
     return this.hasInternalKey()
       ? this.props.internalKey
       : (StatusManagerRenderCount as ReactKey);
-  }
-
-  public addEventListener<
-    IKeyEvents extends Extract<keyof StatusEventsMapping, string>
-  >(id: IKeyEvents, callback: StatusEventsMapping[IKeyEvents]) {
-    const events = this.props.getEvents();
-    events.suscribe(id, callback);
   }
 
   //React LifeCycle Events

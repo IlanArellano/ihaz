@@ -10,24 +10,40 @@ interface EventsList<IEvent extends keyof EventsMap<string>> {
   id: IEvent;
   callback: EventsMap<string>[IEvent];
 }
+export type EventHandlerOptions = Partial<{
+  callPreviousListener: boolean;
+}>;
 
-declare class EventHandler<
+export declare class EventHandler<
   IEvents extends EventsMap<Extract<keyof IEvents, string>>
 > {
   private list: EventsList<Extract<keyof IEvents, string>>[];
+  private options: EventHandlerOptions;
+  private eventArgs: Map<
+    Extract<keyof IEvents, string>,
+    Parameters<EventsMap<string>[Extract<keyof IEvents, string>]>
+  >;
+
+  private _init(): void;
+
+  public setOptions(options: EventHandlerOptions): this;
+
+  private checkCallback(callback: Function): boolean;
 
   public suscribe<IKeyEvents extends Extract<keyof IEvents, string>>(
     id: IKeyEvents,
     callback: EventsMap<string>[IKeyEvents]
   ): void;
 
-  private checkCallback(callback: Function): boolean;
-
   public isAnyEventSuscribed(): boolean;
 
   public isSuscribed<IKeyEvents extends Extract<keyof IEvents, string>>(
     id: IKeyEvents,
     callback: EventsMap<string>[IKeyEvents]
+  ): boolean;
+
+  public isSuscribedByEvent<IKeyEvents extends Extract<keyof IEvents, string>>(
+    id: IKeyEvents
   ): boolean;
 
   public listen<IKeyEvents extends Extract<keyof IEvents, string>>(
@@ -40,10 +56,10 @@ declare class EventHandler<
     ...restValues: Parameters<EventsMap<string>[IKeyEvents]>
   ): void;
 
-  public listenAll(): void;
+  listenAll(): void;
 
   public clear<IKeyEvents extends Extract<keyof IEvents, string>>(
-    id: string,
+    id: IKeyEvents,
     callback: EventsMap<string>[IKeyEvents]
   ): void;
 
@@ -78,12 +94,25 @@ export type StatusEventsMapping = {
 };
 
 interface WithStatusResult<IProps> {
-  Component: ComponentType<IProps>;
+  Component: (
+    props: IProps & Pick<StatusManagerProps, "internalKey">
+  ) => React.ReactElement<IProps>;
   addEventListener: <
     IKeyEvents extends Extract<keyof StatusEventsMapping, string>
   >(
     id: IKeyEvents,
     callback: StatusEventsMapping[IKeyEvents]
+  ) => void;
+  removeEventListenner: <
+    IKeyEvents extends Extract<keyof StatusEventsMapping, string>
+  >(
+    id: IKeyEvents,
+    callback: StatusEventsMapping[IKeyEvents]
+  ) => void;
+  removeListennersByEvent: <
+    IKeyEvents extends Extract<keyof StatusEventsMapping, string>
+  >(
+    id: IKeyEvents
   ) => void;
 }
 

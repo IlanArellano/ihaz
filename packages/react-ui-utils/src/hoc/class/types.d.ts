@@ -1,14 +1,3 @@
-import {
-  Component as ReactComponent,
-  ComponentState,
-  Context,
-  Dispatch,
-  StaticLifecycle,
-  ValidationMap,
-  WeakValidationMap,
-  ComponentType,
-} from "react";
-
 declare type ParametersWithoutFistParam<T extends (...args: any[]) => any> =
   T extends (firstArg: any, ...rest: infer R) => any ? R : never;
 
@@ -17,12 +6,7 @@ export declare type _Object = { [key: string]: any };
 export declare type MethodsWithInstance<IComponent> = {
   [key: string]: (instance: () => IComponent, ...agrs: any[]) => any;
 };
-export declare type MethodsWithStore<IStore> = {
-  [key: string]: (
-    get: <IKey extends keyof IStore>(key: IKey) => IStore[IKey],
-    ...agrs: any[]
-  ) => any;
-};
+
 export type Methods<
   IComponent,
   IMethodInstance extends MethodsWithInstance<IComponent>
@@ -32,16 +16,8 @@ export type Methods<
   ) => ReturnType<IMethodInstance[key]>;
 };
 
-export type MethodsStored<
-  IMethodInstance extends MethodsWithStore<IMethodInstance>
-> = {
-  [key in keyof IMethodInstance]: (
-    ...args: ParametersWithoutFistParam<IMethodInstance[key]>
-  ) => ReturnType<IMethodInstance[key]>;
-};
-
 export type UncontrolledComponent<P = {}> = {
-  Component: ComponentType<P>;
+  Component: (props: P) => React.ReactElement<P>;
   isInstanceMounted: () => boolean;
   getStore: () => _Object | undefined;
 };
@@ -52,15 +28,15 @@ export type InstanceMap<IMethods> = Map<
 >;
 
 export interface CustomComponentClass<
-  IComponent extends ReactComponent,
+  IComponent extends React.Component,
   P,
-  S = ComponentState
-> extends StaticLifecycle<P, S> {
+  S = React.ComponentState
+> extends React.StaticLifecycle<P, S> {
   new (props: P, context?: any): IComponent;
-  propTypes?: WeakValidationMap<P> | undefined;
-  contextType?: Context<any> | undefined;
-  contextTypes?: ValidationMap<any> | undefined;
-  childContextTypes?: ValidationMap<any> | undefined;
+  propTypes?: React.WeakValidationMap<P> | undefined;
+  contextType?: React.Context<any> | undefined;
+  contextTypes?: React.ValidationMap<any> | undefined;
+  childContextTypes?: React.ValidationMap<any> | undefined;
   defaultProps?: Partial<P> | undefined;
   displayName?: string | undefined;
 }
@@ -75,7 +51,7 @@ export interface UncontrolledContextValue<
   Action = UncontolledContextAction
 > {
   getStore: () => State | undefined;
-  dispatch: Dispatch<Action>;
+  dispatch: React.Dispatch<Action>;
 }
 
 export interface UncontrolledContext {
@@ -139,12 +115,12 @@ export interface Options {
 ```
  */
 export default function createUncontrolledClassComponent<
-  IComponent extends ReactComponent<P, S>,
+  IComponent extends React.Component<P, S>,
   IMethods extends MethodsWithInstance<IComponent>,
-  P = IComponent extends ReactComponent<infer IProps> ? IProps : {},
-  S = IComponent extends ReactComponent<any, infer IState>
+  P = IComponent extends React.Component<infer IProps> ? IProps : {},
+  S = IComponent extends React.Component<any, infer IState>
     ? IState
-    : ComponentState
+    : React.ComponentState
 >(
   Comp: CustomComponentClass<IComponent, P, S>,
   methods: IMethods,

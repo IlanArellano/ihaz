@@ -1,21 +1,5 @@
-import type {
-  EffectCallback,
-  DependencyList,
-  ComponentType,
-  PropsWithChildren,
-  ReactNode,
-  Key,
-  Component as ReactComponent,
-  ComponentState,
-  Context,
-  Dispatch,
-  StaticLifecycle,
-  ValidationMap,
-  WeakValidationMap,
-  FC,
-} from "react";
 //GLOBALS
-export declare type ReactKey = Key | null | undefined;
+export declare type ReactKey = React.Key | null | undefined;
 type _Object = { [key: string]: any };
 
 export declare type EventsMap<IEvents extends string> = {
@@ -62,23 +46,40 @@ export interface EventsList<IEvent extends keyof EventsMap<string>> {
   callback: EventsMap<string>[IEvent];
 }
 
-declare class EventHandler<
+export type EventHandlerOptions = Partial<{
+  callPreviousListener: boolean;
+}>;
+
+export declare class EventHandler<
   IEvents extends EventsMap<Extract<keyof IEvents, string>>
 > {
   private list: EventsList<Extract<keyof IEvents, string>>[];
+  private options: EventHandlerOptions;
+  private eventArgs: Map<
+    Extract<keyof IEvents, string>,
+    Parameters<EventsMap<string>[Extract<keyof IEvents, string>]>
+  >;
+
+  private _init(): void;
+
+  public setOptions(options: EventHandlerOptions): this;
+
+  private checkCallback(callback: Function): boolean;
 
   public suscribe<IKeyEvents extends Extract<keyof IEvents, string>>(
     id: IKeyEvents,
     callback: EventsMap<string>[IKeyEvents]
   ): void;
 
-  private checkCallback(callback: Function): boolean;
-
   public isAnyEventSuscribed(): boolean;
 
   public isSuscribed<IKeyEvents extends Extract<keyof IEvents, string>>(
     id: IKeyEvents,
     callback: EventsMap<string>[IKeyEvents]
+  ): boolean;
+
+  public isSuscribedByEvent<IKeyEvents extends Extract<keyof IEvents, string>>(
+    id: IKeyEvents
   ): boolean;
 
   public listen<IKeyEvents extends Extract<keyof IEvents, string>>(
@@ -91,10 +92,10 @@ declare class EventHandler<
     ...restValues: Parameters<EventsMap<string>[IKeyEvents]>
   ): void;
 
-  public listenAll(): void;
+  listenAll(): void;
 
   public clear<IKeyEvents extends Extract<keyof IEvents, string>>(
-    id: string,
+    id: IKeyEvents,
     callback: EventsMap<string>[IKeyEvents]
   ): void;
 
@@ -122,7 +123,7 @@ export class ViewTree {
 }
 
 /* --- Hooks ---*/
-export declare type EffectResult = void | EffectCallback;
+export declare type EffectResult = void | React.EffectCallback;
 
 //UseEffectAsync
 /**Effect  with same function as `React.useEffect` that can be declared a promise in the callback
@@ -142,7 +143,7 @@ export declare type EffectResult = void | EffectCallback;
  */
 export declare function useEffectAsync(
   effect: () => Promise<EffectResult>,
-  deps?: DependencyList
+  deps?: React.DependencyList
 ): void;
 
 //useIntervalEffect
@@ -250,7 +251,7 @@ export declare function useEventHandler<
  */
 export declare function useLayoutEffectAsync(
   effect: () => Promise<EffectResult>,
-  deps: DependencyList
+  deps: React.DependencyList
 ): void;
 
 //useValueHandler
@@ -328,7 +329,7 @@ export type FormProps<T, TProps extends { [k: string]: any }> = {
   render?: React.ComponentType<TProps>;
   ref?: React.Ref<any>;
   onSubmit?: (result: T) => void;
-  children?: ReactNode;
+  children?: React.ReactNode;
 } & (Partial<Pick<TProps, "value">> &
   Pick<TProps, Exclude<keyof TProps, "value" | "onChange" | "onSubmit">> & {
     onChange?: TProps["onChange"] | null;
@@ -358,7 +359,7 @@ export interface FormManager<T> {
   >(
     props: FieldProps<TProps, T>
   ) => React.JSX.Element;
-  Submit: ({ children }: PropsWithChildren) => React.JSX.Element | null;
+  Submit: ({ children }: React.PropsWithChildren) => React.JSX.Element | null;
   useFormValue: () => FormValueStateResolved<T>;
 }
 
@@ -432,17 +433,30 @@ export type StatusEventsMapping = {
 };
 
 interface WithStatusResult<IProps> {
-  Component: ComponentType<IProps>;
+  Component: (
+    props: IProps & Pick<StatusManagerProps, "internalKey">
+  ) => React.ReactElement<IProps>;
   addEventListener: <
     IKeyEvents extends Extract<keyof StatusEventsMapping, string>
   >(
     id: IKeyEvents,
     callback: StatusEventsMapping[IKeyEvents]
   ) => void;
+  removeEventListenner: <
+    IKeyEvents extends Extract<keyof StatusEventsMapping, string>
+  >(
+    id: IKeyEvents,
+    callback: StatusEventsMapping[IKeyEvents]
+  ) => void;
+  removeListennersByEvent: <
+    IKeyEvents extends Extract<keyof StatusEventsMapping, string>
+  >(
+    id: IKeyEvents
+  ) => void;
 }
 
 export declare function withStatus<IProps = any>(
-  Comp: ComponentType<IProps>
+  Comp: React.ComponentType<IProps>
 ): WithStatusResult<IProps>;
 
 //Uncontrolled Components
@@ -451,15 +465,15 @@ export type MethodsWithInstance<IComponent> = {
 };
 //Class
 export interface CustomComponentClass<
-  IComponent extends ReactComponent,
+  IComponent extends React.Component,
   P,
-  S = ComponentState
-> extends StaticLifecycle<P, S> {
+  S = React.ComponentState
+> extends React.StaticLifecycle<P, S> {
   new (props: P, context?: any): IComponent;
-  propTypes?: WeakValidationMap<P> | undefined;
-  contextType?: Context<any> | undefined;
-  contextTypes?: ValidationMap<any> | undefined;
-  childContextTypes?: ValidationMap<any> | undefined;
+  propTypes?: React.WeakValidationMap<P> | undefined;
+  contextType?: React.Context<any> | undefined;
+  contextTypes?: React.ValidationMap<any> | undefined;
+  childContextTypes?: React.ValidationMap<any> | undefined;
   defaultProps?: Partial<P> | undefined;
   displayName?: string | undefined;
 }
@@ -474,7 +488,7 @@ export interface UncontrolledContextValue<
   Action = UncontolledContextAction
 > {
   getStore: () => State | undefined;
-  dispatch: Dispatch<Action>;
+  dispatch: React.Dispatch<Action>;
 }
 
 export interface UncontrolledContext {
@@ -497,7 +511,7 @@ export type Methods<
 };
 
 export type UncontrolledComponent<P = {}> = {
-  Component: ComponentType<P>;
+  Component: (props: P) => React.ReactElement<P>;
   isInstanceMounted: () => boolean;
   getStore: () => _Object | undefined;
 };
@@ -553,30 +567,48 @@ export type UncontrolledComponent<P = {}> = {
 ```
  */
 export declare function createUncontrolledClassComponent<
-  IComponent extends ReactComponent<P, S>,
+  IComponent extends React.Component<P, S>,
   IMethods extends MethodsWithInstance<IComponent>,
-  P = IComponent extends ReactComponent<infer IProps> ? IProps : {},
-  S = IComponent extends ReactComponent<any, infer IState>
+  P = IComponent extends React.Component<infer IProps> ? IProps : {},
+  S = IComponent extends React.Component<any, infer IState>
     ? IState
-    : ComponentState
+    : React.ComponentState
 >(
   Comp: CustomComponentClass<IComponent, P, S>,
   methods: IMethods,
   options?: Partial<Options>
 ): Methods<IComponent, IMethods> & UncontrolledComponent<P>;
 
-//Function
-export type FunctionalMethodResult<IMethods> = (
-  get: <IKey extends keyof IMethods>(key: IKey) => IMethods[IKey],
-  ...agrs: any[]
-) => any;
+export type UncontrolledFC = <
+  IComponent extends (
+    props: P & FunctionalManagerMethods<any>
+  ) => React.ReactNode,
+  IMethods = IComponent extends (props: infer IProps) => React.ReactNode
+    ? IProps extends FunctionalManagerMethods<infer Methods>
+      ? Methods
+      : {}
+    : {},
+  P = IComponent extends (props: infer IProps) => React.ReactNode
+    ? Omit<IProps, keyof FunctionalManagerMethods<any>>
+    : {}
+>(
+  Comp: IComponent,
+  override?: MethodsWithStore<
+    IMethods extends FunctionalMethods ? IMethods : {}
+  >
+) => { methods: IMethods } & Omit<UncontrolledComponent<P>, "getStore">;
 
-export type FunctionalMethods<IMethods> = {
-  [key in keyof IMethods]: FunctionalMethodResult<IMethods>;
+export type MethodsWithStore<IStore extends FunctionalMethods> = {
+  [key: string]: (
+    get: <IKey extends keyof IStore>(key: IKey) => IStore[IKey],
+    ...agrs: any[]
+  ) => any;
 };
 
-export interface FunctionalManagerMethods<IMethods> {
-  set: <IKey extends keyof IMethods>(key: IKey, value: IMethods[IKey]) => void;
+export interface ContextManager<IMethods extends FunctionalMethods, IProps> {
+  Parent: (props: IProps) => React.ReactElement<IProps>;
+  isInstanceMounted: () => boolean;
+  managerMethods: IMethods;
 }
 
 export type MethodsStored<
@@ -587,24 +619,25 @@ export type MethodsStored<
   ) => ReturnType<IMethodInstance[key]>;
 };
 
-export type MethodsWithStore<IStore> = {
-  [Key in keyof IStore]: FunctionalMethodResult<IStore>;
+export type InstanceMap<IMethods> = Map<
+  keyof IMethods,
+  IMethods[keyof IMethods]
+>;
+
+export type FunctionalMethodResult<IMethods> = (
+  get: <IKey extends keyof IMethods>(key: IKey) => IMethods[IKey],
+  ...agrs: any[]
+) => any;
+
+export type FunctionalMethods = {
+  [key: string]: (...args: any[]) => any;
 };
 
-export declare function createUncontrolledFC<
-  IComponent extends FC<P>,
-  IMethods extends _Object,
-  P = IComponent extends FC<FunctionalManagerMethods<IMethods> & infer IProps>
-    ? IProps
-    : {}
->(
-  Comp: IComponent,
-  methods: FunctionalMethods<IMethods>
-): MethodsStored<any> &
-  Omit<
-    UncontrolledComponent<Omit<P, keyof FunctionalManagerMethods<IMethods>>>,
-    "getStore"
-  >;
+export interface FunctionalManagerMethods<IMethods extends FunctionalMethods> {
+  set: <IKey extends keyof IMethods>(key: IKey, value: IMethods[IKey]) => void;
+}
+
+export const createUncontrolledFC: UncontrolledFC;
 
 //createViewManager
 export type OnCloseResult<T> = (result?: T) => void;
@@ -669,7 +702,7 @@ export interface ViewUncontrolledComp
 }
 
 export interface ViewMethods {
-  Component: ComponentType;
+  Component: () => React.ReactElement;
   getTree: () => ViewTree;
   withViewContext: TreeComponent;
 }
@@ -677,10 +710,10 @@ export interface ViewMethods {
 export type IViewManager = Omit<ViewUncontrolledComp, "Component"> &
   ViewMethods;
 
-export type TreeComponent = <T extends _Object>(
-  ComponentWithRef: ComponentType<T>,
+export declare type TreeComponent = <IProps = any>(
+  ComponentWithRef: React.ComponentType<IProps>,
   contextName: string
-) => ComponentType<T>;
+) => (props: IProps) => React.ReactElement;
 
 export type Status = "mounted" | "unmounted";
 

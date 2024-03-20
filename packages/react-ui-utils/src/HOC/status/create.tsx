@@ -7,36 +7,43 @@ import type {
   StatusManagerProps,
   WithStatusResult,
 } from "./types";
-import createUncontrolledClassComponent from "../class/comp";
-
-function createStatusEvent() {
-  return new EventHandler<StatusEventsMapping>();
-}
 
 export default function withStatus<IProps = any>(
   Comp: React.ComponentType<IProps>
 ): WithStatusResult<IProps> {
-  const getEvents = CommonObject.createGetterResource(createStatusEvent);
+  const getEvents = CommonObject.createGetterResource(() =>
+    new EventHandler<StatusEventsMapping>().setOptions({
+      callPreviousListener: true,
+    })
+  );
 
-  const manager = createUncontrolledClassComponent(StatusManagerClass, {
-    addEventListener: <
-      IKeyEvents extends Extract<keyof StatusEventsMapping, string>
-    >(
-      instance: () => StatusManagerClass,
-      id: IKeyEvents,
-      callback: StatusEventsMapping[IKeyEvents]
-    ) => {
-      instance().addEventListener(id, callback);
-    },
-  });
+  const addEventListener: WithStatusResult<IProps>["addEventListener"] = (
+    id,
+    callback
+  ) => {
+    getEvents().suscribe(id, callback);
+  };
+
+  const removeEventListenner: WithStatusResult<IProps>["removeEventListenner"] =
+    (id, callback) => {
+      getEvents().clear(id, callback);
+    };
+
+  const removeListennersByEvent: WithStatusResult<IProps>["removeListennersByEvent"] =
+    (id) => {
+      const events = getEvents();
+      events.clearByEvent(id);
+    };
 
   return {
     Component: (props: IProps & Pick<StatusManagerProps, "internalKey">) => (
       /* @ts-ignore */
-      <manager.Component internalKey={props.internalKey} getEvents={getEvents}>
+      <StatusManagerClass internalKey={props.internalKey} getEvents={getEvents}>
         <Comp {...props} />
-      </manager.Component>
+      </StatusManagerClass>
     ),
-    addEventListener: manager.addEventListener,
+    addEventListener,
+    removeEventListenner,
+    removeListennersByEvent,
   };
 }
