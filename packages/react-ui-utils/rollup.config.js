@@ -35,7 +35,7 @@ const REPLACE_PLUGIN_OPTIONS = {
 };
 
 const RESOLVE_PLUGIN_OPTIONS = {
-  extensions: [".js"],
+  extensions: [".js", ".ts", ".tsx"],
 };
 
 const COMMONJS_PLUGIN_OPTIONS = {
@@ -88,63 +88,57 @@ const PLUGINS = [
   typescript(TYPESCRIPT_CONFIG),
 ];
 
-function addEntry(input, output) {
-  const exports = "named";
-  const inlineDynamicImports = true;
-
-  const onwarn = (warning) => {
-    if (warning.code === "MODULE_LEVEL_DIRECTIVE") {
-      return;
-    }
+//Formats
+function createESMConfig(input, output) {
+  return {
+    input,
+    output: { file: `${output}.mjs`, format: "esm" },
+    plugins: PLUGINS,
   };
+}
 
-  const getEntry = (isMinify) => {
-    return {
-      onwarn,
-      input,
-      plugins: [...PLUGINS, isMinify && terser(TERSER_PLUGIN_OPTIONS)],
-      external: ["react"],
-      inlineDynamicImports,
-    };
+function createCommonJSConfig(input, output) {
+  return {
+    input,
+    output: {
+      file: `${output}.js`,
+      format: "cjs",
+      esModule: false,
+    },
+    plugins: PLUGINS,
   };
+}
 
-  const get_CJS_ESM = (isMinify) => {
-    return {
-      ...getEntry(isMinify),
-      output: [
-        {
-          format: "cjs",
-          file: `${output}.cjs${isMinify ? ".min" : ""}.js`,
-          exports,
-        },
-        {
-          format: "esm",
-          file: `${output}.esm${isMinify ? ".min" : ""}.js`,
-          exports,
-        },
-      ],
-    };
+function createUMDConfig(input, output, env) {
+  let name = pkg.name;
+  const fileName = output.slice((process.env.OUTPUT_DIR + "/umd/").length);
+  const capitalize = (s) => s.slice(0, 1).toUpperCase() + s.slice(1);
+  if (fileName !== "index") {
+    name += fileName.replace(/(\w+)\W*/g, (_, p) => capitalize(p));
+  }
+  return {
+    input,
+    output: {
+      file: `${output}.${env}.js`,
+      format: "umd",
+      name,
+      globals: {
+        react: "React",
+      },
+    },
+    plugins: [...PLUGINS, ...(env === "production" ? [terser()] : [])],
   };
+}
 
-  const get_IIFE = (isMinify) => {
-    return {
-      ...getEntry(isMinify),
-      output: [
-        {
-          format: "iife",
-          name: "utils",
-          file: `${output}${isMinify ? ".min" : ""}.js`,
-          globals: GLOBAL_DEPENDENCIES,
-          exports,
-        },
-      ],
-    };
+function createSystemConfig(input, output, env) {
+  return {
+    input,
+    output: {
+      file: `${output}.${env}.js`,
+      format: "system",
+    },
+    plugins: PLUGINS,
   };
-
-  entries.push(get_CJS_ESM());
-  entries.push(get_CJS_ESM(true));
-  entries.push(get_IIFE());
-  entries.push(get_IIFE(true));
 }
 
 function addPackageJson() {
@@ -153,8 +147,11 @@ function addPackageJson() {
   "name": "${pkg.name}",
   "version": "${pkg.version}",
   "private": false,
-  "author": "Ilan Arellano",
+  "author": "Ilan Arellano <ilanarellano15@gmail.com>",
   "description": "A cross-platform general UI common methods for React Projects",
+  "main": "index.js",
+  "module": "esm/index.mjs",
+  "types": "index.d.ts",
   "homepage": "https://github.com/IlanArellano/ihaz/blob/main/packages/react-ui-utils/README.md",
   "repository": {
       "type": "git",
@@ -169,11 +166,10 @@ function addPackageJson() {
     "react-utils",
     "react native"
   ],
-  "unpkg": "index.min.js",
-  "jsdelivr": "index.min.js",
-  "main": "index.min.js",
-  "module": "index.esm.min.js",
-  "types": "types.d.ts",
+  "sideEffects": false,
+  "files": [
+    "**"
+  ],
   "peerDependencies": {
     "react": "${pkg.peerDependencies.react}"
   },
@@ -191,11 +187,54 @@ function addPackageJson() {
   fs.writeFileSync(path.join(outputDir, "package.json"), packageJson);
 }
 
+function addEntry(input, output, standaloneFile = false) {
+  entries.push(
+    createCommonJSConfig(
+      input,
+      standaloneFile
+        ? `${process.env.OUTPUT_DIR}/${output}`
+        : `${process.env.OUTPUT_DIR}/cjs/${output}`
+    )
+  );
+  entries.push(
+    createESMConfig(input, `${process.env.OUTPUT_DIR}/esm/${output}`)
+  );
+  entries.push(
+    createUMDConfig(
+      input,
+      `${process.env.OUTPUT_DIR}/umd/${output}`,
+      "development"
+    )
+  );
+  entries.push(
+    createUMDConfig(
+      input,
+      `${process.env.OUTPUT_DIR}/umd/${output}`,
+      "production"
+    )
+  );
+  entries.push(
+    createSystemConfig(
+      input,
+      `${process.env.OUTPUT_DIR}/system/${output}`,
+      "development"
+    )
+  );
+  entries.push(
+    createSystemConfig(
+      input,
+      `${process.env.OUTPUT_DIR}/system/${output}`,
+      "production"
+    )
+  );
+}
+
 function addEntries(
   filePath,
   type = "directory",
+  excludeFolders = [],
   indexFileName = "index",
-  excludeFolders = []
+  standaloneFile = false
 ) {
   switch (type) {
     case "directory":
@@ -232,28 +271,18 @@ function addEntries(
               folderName +
               "/" +
               file;
-            const output =
-              process.env.OUTPUT_DIR +
-              "/" +
-              filePath +
-              "/" +
-              folderName +
-              "/" +
-              name;
+            const output = `${filePath}/${folderName}`;
 
-            addEntry(input, output);
+            addEntry(input, output, standaloneFile);
           }
         });
       });
       break;
     case "file":
       const input = process.env.INPUT_DIR + "/" + filePath;
-      const output =
-        process.env.OUTPUT_DIR +
-        "/" +
-        filePath.split(/\.(ts|tsx)$/)[0].toLowerCase();
+      const output = filePath.split(/\.(ts|tsx)$/)[0].toLowerCase();
 
-      addEntry(input, output);
+      addEntry(input, output, standaloneFile);
       break;
     default:
       break;
@@ -261,13 +290,13 @@ function addEntries(
 }
 
 //All
-addEntries("index.ts", "file");
+addEntries("index.ts", "file", [], "index", true);
 //Cache
-addEntries("Cache", "directory", "index", ["logic"]);
+addEntries("Cache", "directory", ["logic"]);
 //HOCs
 addEntries("hoc");
 //Hooks
-addEntries("hooks", "directory", "index", ["shared"]);
+addEntries("hooks", "directory", ["shared"]);
 //Package JSON
 addPackageJson();
 
