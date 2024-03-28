@@ -1,6 +1,6 @@
 # `React UI Utils`
 
-A general UI common methods for general React Projects including React Dom and React Native.
+A general UI common methods for general React Projects.
 
 ## Quick Start
 
@@ -8,7 +8,8 @@ This library is made for every `React` project (React DOM and React Native) mean
 
 ## Advantages
 
-- Library 100% React Core made only.
+- Library 100% React Core made only, so it can be used for all React Projects, such a React Dom and React Native.
+- Free of any dependencies.
 - Provides common `Utilities` that resolve common `React` Project uses.
 - Easy user interface implementations.
 
@@ -16,15 +17,11 @@ This library is made for every `React` project (React DOM and React Native) mean
 
 This library provides the following utilities:
 
-- Cache
-  - [CacheResource](#cacheresource)
-    - [createCacheResources](#createcacheresources)
-    - [clearCacheByResource](#clearcachebyresource)
-    - [clearAllCache](#clearallcache)
-- Managers
-  - [ViewManager](#viewmanager)
-    - [createViewManager](#createviewmanager)
-- Components
+- HOCs
+  - [createViewManager](#createviewmanager)
+  - [createUncontrolledFC](#createuncontrolledfc)
+  - [createUncontrolledClassComponent](#createuncontrolledclasscomponent)
+  - [withStatus](#withstatus)
   - [createFormManager](#createformmanager)
 - Hooks
   - [useEffectAsync](#useeffectasync)
@@ -32,124 +29,25 @@ This library provides the following utilities:
   - [useIntervalEffect](#useintervaleffect)
   - [useValueHandler](#usevaluehandler)
   - [useEventHandler](#useeventhandler)
-- Other Utilities
-  - [createUncontrolledClassComponent](#createuncontrolledclasscomponent)
-
-## Cache
-
-## CacheResource
-
-Cache Resource is a general cache manager can store a function result from a resource collection.
-
-**Import**
-
-```ts
-import { CacheResource } from "@ihaz/react-ui-utils";
-```
-
-### createCacheResources
-
-Method that create a resource collection of methods that the result will be stored in cache, the cache will be cleared when the argument values changes.
-
-**Explanation**
-
-Working
-
-**Example**
-
-```tsx
-import { CacheResource } from "@ihaz/react-ui-utils";
-import { useState } from "react";
-
-const cache = CacheResource.createCacheResources();
-
-const methods_1 = cache.createCache("methods_1", {
-  getUserInfo: (id: string) => fetch("myapi/info"),
-  updateUserInfo: (user: User) => fetch("myapi/update", {
-    method: "PUT",
-    body: user
-  });
-}, {
-  cache: ["getUserInfo"], //Methods from the resource that will be store in cache
-  clear: ["updateUserInfo"] // Methods when will clear the cache when its executed
-})
-
-function UserComponent({id}) {
-  const [user, setUser] = useState({} as User);
-
-  useEffect(() => {
-    const getUser = await methods_1.getUserInfo(id); //The method will search at first in the store in case the id value is the same than the previus call, otherwise executes the original method again
-    setUser(getUser);
-  },[id]);
-
-  const onUpdate = () => {
-    await methods_1.updateUserInfo(user); //When the update is done, it will clear all the cache from the resource
-  }
-
-  return (
-    <>
-      <h1>User {id} details</h1>
-      ...
-      <button onClick={onUpdate}>Update</button>
-    </>
-  );
-}
-```
-
-### clearCacheByResource
-
-Clear all Cache by the key of any Resource manager created by `createCacheResources` method:
-
-```ts
-import { CacheResource } from "@ihaz/react-ui-utils";
-
-const manager = CacheResource.createCacheResources();
-
-CacheResource.clearCacheByResource(manager.key);
-```
-
-Alternatively you can use the private cache Method `clearCache` from any Cache Resources:
-
-```ts
-import { CacheResource } from "@ihaz/react-ui-utils";
-
-const manager = CacheResource.createCacheResources();
-
-manager.clearCache();
-```
-
-### clearAllCache
-
-Remove the Cache for all the store from `Resource Managers` created:
-
-```ts
-import { CacheResource } from "@ihaz/react-ui-utils";
-
-CacheResource.clearAllCache();
-```
-
-## Managers
-
-## ViewManager
-
-An `View` collection enviroment that handle uncontrolled component views in `React`.
-
-**Import**
-
-```ts
-import { ViewManager } from "@ihaz/react-ui-utils";
-```
 
 ### createViewManager
 
+**Import**
+
+```ts
+import { createViewManager } from "@ihaz/react-ui-utils";
+```
+
 Create a view manager that can handle the mount-unmount behavior from the own parent `Tree` component through the `show` and `onClose` methods. Every component is added to internal Parent component state, components inherit a prop called `onClose` when the method is called it will remove from the internal state, the method can also return a result when the component is closed.
+
+:large_blue_diamond: This HOC is useful if it wants to render views thats has or not any relation to the component which its invoked or it can be render outside the component, such a Modals or Dialogs.
 
 **Usage**
 
 ```tsx
-import { ViewManager } from "@ihaz/react-ui-utils";
+import { createViewManager } from "@ihaz/react-ui-utils";
 
-const manager = ViewManager.createViewManager();
+const manager = createViewManager();
 
 const ViewComponent = ({ onClose }: ViewProps<string>) => {
   return (
@@ -424,7 +322,65 @@ function App() {
 export default App;
 ```
 
-## Components
+### createUncontrolledFC
+
+### createUncontrolledClassComponent
+
+**Import**
+
+```ts
+import { createUncontrolledClassComponent } from "@ihaz/react-ui-utils";
+```
+
+Provides a React Class Component where the internal methods can be malipulated by other React component throught their own instance.
+
+**Example**
+
+```tsx
+import { Component } from "react";
+import { createUncontrolledClassComponent } from "@ihaz/react-ui-utils";
+
+class ExampleClassComponent extends Component<any, {selector: number}> {
+  constructor(props: any) {
+      super(props);
+      this.state = {
+          selector: 1
+      }
+  }
+
+  getSelector = () => this.state.selector;
+  changeSelector = (new_selector: number) => this.setState({ selector: new_selector });
+
+  render() {
+      return ... //JSX
+  }
+}
+
+
+const UncontrolledExample = createUncontrolledClassComponent(ExampleClassComponent, {
+  getSelector: (instance) => instance().getSelector(),
+changeSelector: (instance, new_selector: number) => instance().changeSelector(new_selector),
+});
+
+
+export const Main = () => {
+
+  const show = () => {
+     console.log(UncontrolledExample.getSelector()) // 1
+  }
+    const changeSelector = () => {
+  UncontrolledExample.changeSelector(2); //Changes internal selector state to 2
+};
+
+  return <>
+<UncontrolledExample.Component />
+  <button onClick={show}>Show Selector</button>
+  <button onClick={changeSelector}>Change Selector</button>
+  </>
+}
+```
+
+### withStatus
 
 ### createFormManager
 
@@ -674,62 +630,4 @@ const Example = () => {
 
   return <button onClick={handleFetch}>Fetch</button>;
 };
-```
-
-## Other Utilities
-
-### createUncontrolledClassComponent
-
-**Import**
-
-```ts
-import { createUncontrolledClassComponent } from "@ihaz/react-ui-utils";
-```
-
-**A way to keep alive class components.**. Provides a React Class Component where the internal methods can be malipulated by other React component throught their own instance.
-
-**Example**
-
-```tsx
-import { Component } from "react";
-import { createUncontrolledClassComponent } from "@ihaz/react-ui-utils";
-
-class ExampleClassComponent extends Component<any, {selector: number}> {
-  constructor(props: any) {
-      super(props);
-      this.state = {
-          selector: 1
-      }
-  }
-
-  getSelector = () => this.state.selector;
-  changeSelector = (new_selector: number) => this.setState({ selector: new_selector });
-
-  render() {
-      return ... //JSX
-  }
-}
-
-
-const UncontrolledExample = createUncontrolledClassComponent(ExampleClassComponent, {
-  getSelector: (instance) => instance().getSelector(),
-changeSelector: (instance, new_selector: number) => instance().changeSelector(new_selector),
-});
-
-
-export const Main = () => {
-
-  const show = () => {
-     console.log(UncontrolledExample.getSelector()) // 1
-  }
-    const changeSelector = () => {
-  UncontrolledExample.changeSelector(2); //Changes internal selector state to 2
-};
-
-  return <>
-<UncontrolledExample.Component />
-  <button onClick={show}>Show Selector</button>
-  <button onClick={changeSelector}>Change Selector</button>
-  </>
-}
 ```
