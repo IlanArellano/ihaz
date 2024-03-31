@@ -1,16 +1,16 @@
 import * as React from "react";
 import CommonObject from "@jsUtils/namespaces/object";
 import type {
-  ParametersWithoutFistParam,
-  _Object,
   CustomComponentClass,
-  Options,
-  UncontolledContextAction,
-  UncontrolledContextValue,
   Methods,
   MethodsWithInstance,
+  Options,
+  ParametersWithoutFistParam,
+  UncontolledContextAction,
   UncontrolledComponent,
-} from "./types";
+  UncontrolledContextValue,
+  _Object,
+} from "@utils/types";
 
 const isClassComponent = (component: any) =>
   typeof component === "function" && !!component.prototype.isReactComponent;

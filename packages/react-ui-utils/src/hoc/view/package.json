@@ -1,7 +1,0 @@
-{
-    "main": "./index.cjs.js",
-    "module": "./index.esm.js",
-    "unpkg": "./index.min.js",
-    "types": "./types.d.ts",
-    "sideEffects": false
-}

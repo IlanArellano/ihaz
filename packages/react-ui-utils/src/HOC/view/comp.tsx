@@ -1,5 +1,5 @@
 import * as React from "react";
-import type { ViewComponentProps } from "./types";
+import type { ViewComponentProps } from "@utils/types";
 
 export function ViewMainComponent(props: ViewComponentProps) {
   const x = props.views;

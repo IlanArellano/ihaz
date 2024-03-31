@@ -1,7 +1,7 @@
 import * as React from "react";
 import Execute from "@jsUtils/namespaces/execute";
 import ValueHandler from "@jsUtils/classes/ValueHandler";
-import { Value, ValueHandlerResult, ValueSetter } from "./types";
+import type { Value, ValueHandlerResult, ValueSetter } from "@utils/types";
 
 const init = <IValue>(initial?: IValue) =>
   new ValueHandler(initial) as ValueHandler<IValue>;

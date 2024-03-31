@@ -1,5 +1,5 @@
 import { cacheReducer } from "../logic/context";
-import type { AppCacheAction, CacheResource, CacheState } from "./types";
+import type { AppCacheAction, CacheResource, CacheState } from "@utils/types";
 
 const CACHE_INITIAL = {} as CacheState;
 

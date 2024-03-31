@@ -6,7 +6,7 @@ import type {
   StatusEventsMapping,
   StatusManagerProps,
   WithStatusResult,
-} from "./types";
+} from "@utils/types";
 
 export default function withStatus<IProps = any>(
   Comp: React.ComponentType<IProps>

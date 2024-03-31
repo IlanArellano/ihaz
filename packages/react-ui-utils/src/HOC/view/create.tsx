@@ -2,16 +2,16 @@ import * as React from "react";
 import { ViewManagerComponent } from "./manager";
 import { registerTreeComponent } from "./registerTreeComponent";
 import { ViewTree } from "./tree";
-import { ViewTree as ViewViewType } from "./types";
+import CommonObject from "@jsUtils/namespaces/object";
+import createUncontrolledClassComponent from "../class/comp";
 import type {
   ConditionView,
   IViewManager,
   ShowFunc,
   ShowFuncSync,
   ViewUncontrolledComp,
-} from "./types";
-import CommonObject from "@jsUtils/namespaces/object";
-import createUncontrolledClassComponent from "../class/comp";
+  ViewTree as ViewTreeType,
+} from "@utils/types";
 
 function createTree() {
   return new ViewTree();
@@ -20,7 +20,7 @@ function createTree() {
 export default function createViewManager(): IViewManager {
   const getTree = CommonObject.createGetterResource(
     createTree
-  ) as unknown as () => ViewViewType;
+  ) as unknown as () => ViewTreeType;
 
   const manager = createUncontrolledClassComponent(ViewManagerComponent, {
     show: (

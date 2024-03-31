@@ -3,7 +3,7 @@ import "@testing-library/jest-dom";
 import createViewManager from "./create";
 import ReactDOM from "react-dom/client";
 import { act } from "@testing-library/react";
-import { ViewProps } from "./types";
+import type { ViewProps } from "@utils/types";
 
 interface ExampleProps extends ViewProps<boolean> {
   message: string;

@@ -1,5 +1,5 @@
 import * as React from "react";
-import type { TreeComponent, ViewTree } from "./types";
+import type { TreeComponent, ViewTree } from "@utils/types";
 
 export const registerTreeComponent =
   (getTree: () => ViewTree): TreeComponent =>

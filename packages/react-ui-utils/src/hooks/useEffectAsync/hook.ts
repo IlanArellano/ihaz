@@ -1,6 +1,6 @@
 import * as React from "react";
 import { createAsyncEffect } from "../shared/effect";
-import { EffectResult } from "./types";
+import type { EffectResult } from "@utils/types";
 
 export default function useEffectAsync(
   effect: () => Promise<EffectResult>,

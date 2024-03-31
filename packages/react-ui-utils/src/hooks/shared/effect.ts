@@ -1,5 +1,5 @@
 import Validation from "@jsUtils/namespaces/validation";
-import { EffectResult } from "../useEffectAsync/types";
+import type { EffectResult } from "@utils/types";
 
 export const createAsyncEffect =
   (effect: () => Promise<EffectResult> | EffectResult) => () => {

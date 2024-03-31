@@ -1,6 +1,8 @@
 import CommonObject from "@jsUtils/namespaces/object";
 import CacheManager from "../resource/cacheManager";
-import {
+import { EMPTY_FUNCTION_CACHE } from "./context";
+import { cacheCall } from "./func";
+import type {
   CacheConfig,
   CacheResource,
   CacheResourceConfig,
@@ -8,9 +10,7 @@ import {
   NamedResource,
   Resource,
   ResourceCacheAction,
-} from "../resource/types";
-import { EMPTY_FUNCTION_CACHE } from "./context";
-import { cacheCall } from "./func";
+} from "@utils/types";
 
 function getFuncCacheDispatch<T>(
   resourceDispatch: (
@@ -46,7 +46,6 @@ export const addCacheResource =
     const depends = resourceConf.depends || [];
     const dispatchResource = (ac: ResourceCacheAction<string>) => {
       if (ac.type == "clear") {
-        //Si es limpiar el resource, lanzamos una acción de limpiado recursiva para limpiar este y todos los demás resources
         cacheManager.dispatch({
           type: "clearRec",
           payload: {
@@ -107,7 +106,6 @@ export function cacheResourceFuncs<T extends Resource<string>>(
 
         const cache = get();
 
-        //Si no se ocupa usar el cache se realiza la llamada igual pero con un emptyCache y un fDispatch que no hace nada
         const fCache = ((usarCache && cache[key]) || EMPTY_FUNCTION_CACHE)!;
         const fDispatch = getFuncCacheDispatch(
           dispatch,

@@ -1,7 +1,7 @@
 import * as React from "react";
 import IntervalHandler from "@jsUtils/classes/IntervalHandler";
-import { EffectResult, IntervalEffectMethods } from "./types";
 import useValueHandler from "../useValueHandler/hook";
+import type { EffectResult, IntervalEffectMethods } from "@utils/types";
 
 export default function useIntervalEffect<IDeps = {}>(
   effect: (intervalValues: IDeps) => EffectResult,

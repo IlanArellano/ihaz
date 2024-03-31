@@ -1,5 +1,5 @@
 import * as React from "react";
-import type { ReactKey, StatusManagerProps } from "./types";
+import type { ReactKey, StatusManagerProps } from "@utils/types";
 
 let StatusManagerRenderCount: number = 0;
 

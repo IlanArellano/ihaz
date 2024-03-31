@@ -3,7 +3,7 @@ import EventHandler from "@jsUtils/classes/EventHandler";
 import ValueHandler from "@jsUtils/classes/ValueHandler";
 import CommonObject from "@jsUtils/namespaces/object";
 import { ControlForm, ControlView } from "./controlView";
-import {
+import type {
   FieldProps,
   FormContext,
   FormEventsMapping,
@@ -13,7 +13,7 @@ import {
   FormValueStateResolved,
   Validation,
   ValidationResolve,
-} from "./types";
+} from "@utils/types";
 
 const EvalValidation = <T, Key extends keyof T>(
   value: T[Key],

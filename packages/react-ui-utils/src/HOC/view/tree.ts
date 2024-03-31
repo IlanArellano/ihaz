@@ -3,9 +3,8 @@ import ValueHandler from "@jsUtils/classes/ValueHandler";
 import type {
   ComponentRegister,
   EventHandlerRegister,
-  EventHandlerRegisterMapping,
   Status,
-} from "./types";
+} from "@utils/types";
 
 export const VIEW_TREE_EVENT = "close";
 

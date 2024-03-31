@@ -5,7 +5,7 @@ import type {
   FunctionalMethods,
   InstanceMap,
   MethodsWithStore,
-} from "./types";
+} from "@utils/types";
 
 export function createFunctionalInstance<
   IComponent extends (props: P) => React.ReactNode,

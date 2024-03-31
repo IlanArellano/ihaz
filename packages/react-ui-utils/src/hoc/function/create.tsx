@@ -1,10 +1,10 @@
 import * as React from "react";
+import { createFunctionalInstance } from "./manager";
 import type {
   FunctionalManagerMethods,
   FunctionalMethods,
   MethodsWithStore,
-} from "./types";
-import { createFunctionalInstance } from "./manager";
+} from "@utils/types";
 
 interface ContextManager<IMethods extends FunctionalMethods, IProps> {
   Parent: (props: IProps) => React.ReactNode;

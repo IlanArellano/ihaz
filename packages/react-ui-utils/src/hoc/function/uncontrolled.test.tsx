@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { act, render, screen } from "@testing-library/react";
 import createUncontrolledFC from "./comp";
 import "@testing-library/jest-dom";
-import type { FunctionalManagerMethods } from "./types";
+import type { FunctionalManagerMethods } from "@utils/types";
 
 type IUncontrolledMethods = {
   getCounter: () => number;

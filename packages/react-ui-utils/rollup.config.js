@@ -149,9 +149,9 @@ function addPackageJson() {
   "private": false,
   "author": "Ilan Arellano <ilanarellano15@gmail.com>",
   "description": "A cross-platform general UI common methods for React Projects",
-  "main": "index.js",
+  "main": "cjs/index.js",
   "module": "esm/index.mjs",
-  "types": "index.d.ts",
+  "types": "types.d.ts",
   "homepage": "https://github.com/IlanArellano/ihaz/blob/main/packages/react-ui-utils/README.md",
   "repository": {
       "type": "git",
@@ -290,13 +290,13 @@ function addEntries(
 }
 
 //All
-addEntries("index.ts", "file", [], "index", true);
-//Cache
+addEntries("index.ts", "file", [], "index");
+/*//Cache
 addEntries("Cache", "directory", ["logic"]);
 //HOCs
 addEntries("hoc");
 //Hooks
-addEntries("hooks", "directory", ["shared"]);
+addEntries("hooks", "directory", ["shared"]);*/
 //Package JSON
 addPackageJson();
 

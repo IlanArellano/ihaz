@@ -4,7 +4,7 @@ import type {
   AppCacheAction,
   CacheManagers,
   ICacheResourceUncontrolled,
-} from "./types";
+} from "@utils/types";
 
 /**
  * Cache Resource Manager

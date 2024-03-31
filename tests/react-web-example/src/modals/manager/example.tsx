@@ -1,6 +1,6 @@
 import React from "react";
 import ModalBase from "../base";
-import { ViewProps } from "@ihaz/react-ui-utils/hoc/view";
+import { ViewProps } from "@ihaz/react-ui-utils";
 
 interface ExampleManagerModalProps extends ViewProps<boolean> {
   hideComponent: () => void;

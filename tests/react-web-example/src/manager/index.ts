@@ -1,8 +1,10 @@
-import withStatus from "@ihaz/react-ui-utils/hoc/status";
-import createViewManager from "@ihaz/react-ui-utils/hoc/view";
-import createFormManager from "@ihaz/react-ui-utils/hoc/form";
+import {
+  createFormManager,
+  createViewManager,
+  withStatus,
+  createUncontrolledFC,
+} from "@ihaz/react-ui-utils";
 import StatusTest from "./Comp";
-import { createUncontrolledFC } from "@ihaz/react-ui-utils";
 import UncontrolledFunction from "@app/uncontrolled/functional/uncontrolled";
 
 const INITIAL_FORM = {

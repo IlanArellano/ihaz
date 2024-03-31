@@ -1,4 +1,4 @@
-import { ViewProps } from "@ihaz/react-ui-utils/hoc/view";
+import { ViewProps } from "@ihaz/react-ui-utils";
 import { Dialog } from "primereact/dialog";
 import { PropsWithChildren } from "react";
 

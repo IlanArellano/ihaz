@@ -1,6 +1,6 @@
 import * as React from "react";
-import EventHandler, { EventsMap } from "@jsUtils/classes/EventHandler";
-import { EventHandlerOptions, HandleEvents } from "./types";
+import EventHandler, { type EventsMap } from "@jsUtils/classes/EventHandler";
+import type { EventHandlerOptions, HandleEvents } from "@utils/types";
 
 export default function useEventHandler<
   Mapping extends EventsMap<string> = any

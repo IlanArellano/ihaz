@@ -10,7 +10,7 @@ import type {
   ShowFuncSync,
   ViewComponentProps,
   ViewManagerComponentProps,
-} from "./types";
+} from "@utils/types";
 
 export class ViewManagerComponent extends React.PureComponent<
   ViewManagerComponentProps,

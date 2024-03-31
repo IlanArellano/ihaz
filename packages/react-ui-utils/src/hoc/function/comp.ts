@@ -1,5 +1,5 @@
-import type { UncontrolledFC, _Object } from "./types";
 import { createFunctionalContextManager } from "./create";
+import type { UncontrolledFC } from "@utils/types";
 
 const isFunctionalComponent = (component: any) =>
   typeof component === "function" && !component.prototype.isReactComponent;
