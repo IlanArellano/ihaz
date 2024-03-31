@@ -5,7 +5,8 @@ import { VIEW_TREE_EVENT } from "./tree";
 import type {
   ConditionView,
   Entry,
-  EventHandlerRegister,
+  EventHandler,
+  EventHandlerRegisterMapping,
   ShowFunc,
   ShowFuncSync,
   ViewComponentProps,
@@ -35,9 +36,9 @@ export class ViewManagerComponent extends React.PureComponent<
         props: {
           onClose: (result: any) => {
             this.handleClose(currId, resolve)(result);
-            let handler: EventHandlerRegister | undefined;
+            let handler: EventHandler<EventHandlerRegisterMapping> | undefined;
             if (context && (handler = tree.getComponentHandler(context))) {
-              handler.event.clearByEvent(VIEW_TREE_EVENT);
+              handler.clearByEvent(VIEW_TREE_EVENT);
             }
           },
           ...(props || {}),
@@ -48,7 +49,7 @@ export class ViewManagerComponent extends React.PureComponent<
     });
   };
 
-  showSync: ShowFuncSync = (render, props, onCloseListenner, context) => {
+  showSync: ShowFuncSync = (render, props, onCloseListener, context) => {
     const currId = this.state.nextId;
     const tree = this.props.getTree();
 
@@ -59,11 +60,11 @@ export class ViewManagerComponent extends React.PureComponent<
         ...(props || {}),
         onClose: (res) => {
           this.handleCloseSync(currId);
-          let handler: EventHandlerRegister | undefined;
+          let handler: EventHandler<EventHandlerRegisterMapping> | undefined;
           if (context && (handler = tree.getComponentHandler(context))) {
-            handler.event.clearByEvent(VIEW_TREE_EVENT);
+            handler.clearByEvent(VIEW_TREE_EVENT);
           }
-          if (onCloseListenner) onCloseListenner(res as never);
+          if (onCloseListener) onCloseListener(res as never);
         },
       },
     };
@@ -77,7 +78,7 @@ export class ViewManagerComponent extends React.PureComponent<
       },
       close: () => {
         this.handleCloseSync(entry.id);
-        if (onCloseListenner) onCloseListenner(undefined as never);
+        if (onCloseListener) onCloseListener(entry.props.defaultValue as never);
       },
     };
   };
@@ -89,16 +90,12 @@ export class ViewManagerComponent extends React.PureComponent<
   ) => {
     const tree = this.props.getTree();
     if (context) {
-      const componentDetails = tree.getComponentDetails(context);
-      const handler = tree.getComponentHandler(context);
-      if (
-        componentDetails &&
-        componentDetails.status === "mounted" &&
-        handler
-      ) {
+      const componentStatus = tree.getComponentDetails(context);
+      if (componentStatus === "mounted") {
+        const handler = tree.getComponentHandler(context);
         this.addEntry(entry);
-        handler.event.suscribe(VIEW_TREE_EVENT, () => {
-          this.handleClose(entry.id, resolve)(undefined);
+        handler.suscribe(VIEW_TREE_EVENT, () => {
+          this.handleClose(entry.id, resolve)(entry.props.defaultValue);
         });
       } else {
         console.warn(
@@ -114,15 +111,11 @@ export class ViewManagerComponent extends React.PureComponent<
   private startViewSync = (entry: Entry, context?: string) => {
     const tree = this.props.getTree();
     if (context) {
-      const componentDetails = tree.getComponentDetails(context);
-      const handler = tree.getComponentHandler(context);
-      if (
-        componentDetails &&
-        componentDetails.status === "mounted" &&
-        handler
-      ) {
+      const componentStatus = tree.getComponentDetails(context);
+      if (componentStatus === "mounted") {
+        const handler = tree.getComponentHandler(context);
         this.addEntry(entry);
-        handler.event.suscribe(VIEW_TREE_EVENT, () => {
+        handler.suscribe(VIEW_TREE_EVENT, () => {
           this.handleCloseSync(entry.id);
         });
       } else {

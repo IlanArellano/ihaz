@@ -107,19 +107,25 @@ export declare class EventHandler<
 }
 
 export class ViewTree {
-  private componentMountEvents: ValueHandler<EventHandlerRegister[]>;
-  private components: ValueHandler<ComponentRegister[]>;
+  private componentMountEvents: Map<
+    string,
+    EventHandler<EventHandlerRegisterMapping>
+  >;
+  private components: Map<string, Status>;
 
   public registerComponent(entry: ComponentRegister): void;
 
   public changeStatus(key: string, status: Status): void;
 
-  private modifyEntry(entry: ComponentRegister, index: number): void;
+  private modifyEntry(entry: ComponentRegister): void;
 
   private addEntry(entry: ComponentRegister): void;
 
-  public getComponentDetails(key: string): ComponentRegister | undefined;
-  public getComponentHandler(key: string): EventHandlerRegister | undefined;
+  public getComponentDetails(key: string): Status;
+
+  public getComponentHandler(
+    key: string
+  ): EventHandler<EventHandlerRegisterMapping>;
 }
 
 /* --- Hooks ---*/
@@ -643,8 +649,17 @@ export const createUncontrolledFC: UncontrolledFC;
 export type OnCloseResult<T> = (result?: T) => void;
 
 export interface ViewProps<IResult = never> {
+  /**Close the View, the arg value represents the result of the view when has been closed and resolve
+   * the `show` method or call onCloseListener from `showSync` method
+   */
   onClose: OnCloseResult<IResult>;
+  /**Default value which will returned in `show` or `showSync` method when the binding context
+   * component that has registered in `withViewContext` or `useViewContext` was unmounted
+   */
+  defaultValue?: IResult;
 }
+
+export type OmittedViewProps = keyof Pick<ViewProps<any>, "onClose">;
 
 export interface Entry {
   id: number;
@@ -659,8 +674,13 @@ export interface ViewComponentProps {
 
 export type ShowFunc = <TProps>(
   render: React.ComponentType<TProps>,
-  props?: Omit<TProps, keyof ViewProps<any>>,
+  props?: Omit<TProps, OmittedViewProps>,
   context?: string
+) => Promise<TProps extends ViewProps<infer TResult> ? TResult : unknown>;
+
+export type ShowFuncWithoutContext = <TProps>(
+  render: React.ComponentType<TProps>,
+  props?: Omit<TProps, OmittedViewProps>
 ) => Promise<TProps extends ViewProps<infer TResult> ? TResult : unknown>;
 
 export interface ViewSyncStartOptions {
@@ -681,11 +701,19 @@ export interface ViewSyncResult {
 
 export type ShowFuncSync = <TProps>(
   render: React.ComponentType<TProps>,
-  props?: Omit<TProps, keyof ViewProps<any>>,
-  onCloseListenner?: (
+  props?: Omit<TProps, OmittedViewProps>,
+  onCloseListener?: (
     res: TProps extends ViewProps<infer IResult> ? IResult : never
   ) => void,
   context?: string
+) => ViewSyncResult;
+
+export type ShowFuncSyncWithoutContext = <TProps>(
+  render: React.ComponentType<TProps>,
+  props?: Omit<TProps, OmittedViewProps>,
+  onCloseListener?: (
+    res: TProps extends ViewProps<infer IResult> ? IResult : never
+  ) => void
 ) => ViewSyncResult;
 
 export type ConditionView = (x: Entry) => boolean;
@@ -702,16 +730,23 @@ export interface ViewUncontrolledComp
 }
 
 export interface ViewMethods {
+  /**Parent Component which create a instance for manage all View Collections. It must be in React Tree for have
+   * the access for all the rest of methods
+   */
   Component: () => React.ReactElement;
-  getTree: () => ViewTree;
+  /**HOC that bind a component to a internal context to close all the views when component was unmounted */
   withViewContext: TreeComponent;
+  /**Hook that bind a component to a internal context to close all the views when component was unmounted */
+  useViewContext: (contextName: string) => ViewContextHook;
 }
 
 export type IViewManager = Omit<ViewUncontrolledComp, "Component"> &
   ViewMethods;
 
 export declare type TreeComponent = <IProps = any>(
-  ComponentWithRef: React.ComponentType<IProps>,
+  ComponentWithRef: React.ComponentType<
+    IProps & Omit<ViewContextHook, "register" | "unregister">
+  >,
   contextName: string
 ) => (props: IProps) => React.ReactElement;
 
@@ -729,6 +764,14 @@ export type EventHandlerRegisterMapping = {
 export interface EventHandlerRegister {
   key: string;
   event: EventHandler<EventHandlerRegisterMapping>;
+}
+
+export interface ViewContextHook {
+  register: () => void;
+  unregister: () => void;
+  show: ShowFuncWithoutContext;
+  showSync: ShowFuncSyncWithoutContext;
+  getContext: () => string;
 }
 
 /**Create a view manager that can handle the mount-unmount behavior from the own parent `Tree` component

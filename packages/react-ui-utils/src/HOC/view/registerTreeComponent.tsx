@@ -1,26 +1,26 @@
 import * as React from "react";
-import type { TreeComponent, ViewTree } from "@utils/types";
+import type { TreeComponent, ViewContextHook } from "@utils/types";
 
 export const registerTreeComponent =
-  (getTree: () => ViewTree): TreeComponent =>
+  (useViewContext: (contextName: string) => ViewContextHook): TreeComponent =>
   (ComponentWithRef, contextName) => {
-    if (!contextName)
-      throw new Error(
-        "No contextName has provider for this register, this must have a unique identifier to manage the views binding to context"
-      );
     return (props) => {
+      const { register, unregister, show, showSync, getContext } =
+        useViewContext(contextName);
       React.useEffect(() => {
-        const tree = getTree();
-        tree.registerComponent({
-          key: contextName,
-          status: "mounted",
-        });
-
+        register();
         return () => {
-          tree.changeStatus(contextName, "unmounted");
+          unregister();
         };
       }, []);
 
-      return <ComponentWithRef {...(props as any)} />;
+      return (
+        <ComponentWithRef
+          {...(props as any)}
+          show={show}
+          showSync={showSync}
+          getContext={getContext}
+        />
+      );
     };
   };

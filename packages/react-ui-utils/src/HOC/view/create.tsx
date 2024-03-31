@@ -12,6 +12,7 @@ import type {
   ViewUncontrolledComp,
   ViewTree as ViewTreeType,
 } from "@utils/types";
+import createViewContextHook from "./hook/create";
 
 function createTree() {
   return new ViewTree();
@@ -37,22 +38,26 @@ export default function createViewManager(): IViewManager {
       instance: () => ViewManagerComponent,
       render: Parameters<ShowFuncSync>[0],
       props: Parameters<ShowFuncSync>[1],
-      onCloseListenner: Parameters<ShowFuncSync>[2],
+      onCloseListener: Parameters<ShowFuncSync>[2],
       context: Parameters<ShowFuncSync>[3]
     ) => {
-      return instance().showSync(render, props, onCloseListenner, context);
+      return instance().showSync(render, props, onCloseListener, context);
     },
     removeEntries: (instance, condition?: ConditionView) => {
       instance().removeSomeEntries(condition);
     },
   }) as ViewUncontrolledComp;
 
-  const withViewContext = registerTreeComponent(getTree);
+  const getManager = () => manager;
+
+  const useViewContext = createViewContextHook(getManager, getTree);
+
+  const withViewContext = registerTreeComponent(useViewContext);
 
   return {
     ...manager,
     Component: () => <manager.Component getTree={getTree} />,
     withViewContext,
-    getTree,
+    useViewContext,
   };
 }

@@ -1,20 +1,22 @@
 import EventHandler from "@jsUtils/classes/EventHandler";
-import ValueHandler from "@jsUtils/classes/ValueHandler";
 import type {
   ComponentRegister,
-  EventHandlerRegister,
+  EventHandlerRegisterMapping,
   Status,
 } from "@utils/types";
 
 export const VIEW_TREE_EVENT = "close";
 
 export class ViewTree {
-  private componentMountEvents: ValueHandler<EventHandlerRegister[]>;
-  private components: ValueHandler<ComponentRegister[]>;
+  private componentMountEvents: Map<
+    string,
+    EventHandler<EventHandlerRegisterMapping>
+  >;
+  private components: Map<string, Status>;
 
   constructor() {
-    this.componentMountEvents = new ValueHandler([]);
-    this.components = new ValueHandler([]);
+    this.componentMountEvents = new Map();
+    this.components = new Map();
   }
 
   public registerComponent(entry: ComponentRegister) {
@@ -22,55 +24,35 @@ export class ViewTree {
   }
 
   public changeStatus(key: string, status: Status) {
-    const comp = this.components.get();
-    const index = comp.findIndex((x) => x.key === key);
-    if (index === -1) return;
-    this.modifyEntry({ ...comp[index], status }, index);
+    this.modifyEntry({ key, status });
   }
 
-  private modifyEntry(entry: ComponentRegister, index: number) {
-    const newState = this.components.getDeepCopy();
-    newState[index] = entry;
-    this.components.set(newState);
-    if (entry.status === "unmounted" && this.componentMountEvents) {
+  private modifyEntry(entry: ComponentRegister) {
+    if (!this.components.has(entry.key)) return;
+    this.components.set(entry.key, entry.status);
+    if (entry.status === "unmounted") {
       const MountRef = this.getComponentHandler(entry.key);
       if (MountRef) {
-        MountRef.event.listen(VIEW_TREE_EVENT);
-        MountRef.event.clearByEvent(VIEW_TREE_EVENT);
+        MountRef.listen(VIEW_TREE_EVENT);
+        MountRef.clearByEvent(VIEW_TREE_EVENT);
       }
     }
   }
 
   private addEntry(entry: ComponentRegister) {
-    const comp = this.components.get();
-    if (comp.some((x) => x.key === entry.key)) {
-      this.components.set(
-        comp.map((x) => {
-          if (x.key === entry.key) return entry;
-          return x;
-        })
-      );
-      return;
-    }
-    this.components.set(comp.concat(entry));
-    if (this.componentMountEvents) {
-      this.componentMountEvents.set(
-        this.componentMountEvents.get().concat([
-          {
-            key: entry.key,
-            /* @ts-ignore */
-            event: new EventHandler<EventHandlerRegisterMapping>(),
-          },
-        ])
-      );
-    }
+    this.components.set(entry.key, entry.status);
+    if (this.componentMountEvents.has(entry.key)) return;
+    this.componentMountEvents.set(
+      entry.key,
+      new EventHandler<EventHandlerRegisterMapping>()
+    );
   }
 
   public getComponentDetails(key: string) {
-    return this.components.get().find((comp) => comp?.key === key);
+    return this.components.get(key);
   }
 
   public getComponentHandler(key: string) {
-    return this.componentMountEvents.get().find((x) => x.key === key);
+    return this.componentMountEvents.get(key);
   }
 }
