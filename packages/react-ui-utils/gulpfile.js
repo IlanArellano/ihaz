@@ -3,7 +3,7 @@ import rename from "gulp-rename";
 
 gulp.task("copy-d.ts", function () {
   return gulp
-    .src(process.env.INPUT_DIR + "index.d.ts")
+    .src(process.env.INPUT_DIR + "types.d.ts")
     .pipe(
       rename(function (path) {
         path.basename = path.basename.toLowerCase();

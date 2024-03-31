@@ -1,7 +1,7 @@
 import * as React from "react";
 import { CommonObject, Client } from "@jsUtils/namespaces";
 import { Form, Input } from "./FormComp";
-import type { FieldProps, FormProps } from "./types";
+import type { FieldProps, FormProps } from "@utils/types";
 
 export const ControlView = React.forwardRef<
   any,
