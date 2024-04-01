@@ -382,6 +382,8 @@ export const Main = () => {
 
 ### withStatus
 
+Is a HOC
+
 ### createFormManager
 
 **Import**
