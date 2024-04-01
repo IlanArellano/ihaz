@@ -746,7 +746,7 @@ export type IViewManager = Omit<ViewUncontrolledComp, "Component"> &
 export declare type TreeComponent = <IProps = any>(
   ComponentWithRef: React.ComponentType<IProps & ViewContextProps>,
   contextName: string
-) => (props: IProps) => React.ReactElement;
+) => (props: Omit<IProps, keyof ViewContextProps>) => React.ReactElement;
 
 export type Status = "mounted" | "unmounted";
 

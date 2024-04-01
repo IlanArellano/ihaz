@@ -1,18 +1,19 @@
 "use client";
 import { HOC } from "@app/manager";
 import ExampleManagerModal from "@app/modals/manager/example";
+import { ViewContextProps } from "@ihaz/react-ui-utils";
 import { useState } from "react";
 
+interface ShowComponentProps extends ViewContextProps {
+  hideComponent: () => void;
+}
+
 const ShowComponent = HOC.View.withViewContext(
-  ({ hideComponent }: { hideComponent: () => void }) => {
+  ({ hideComponent, show }: ShowComponentProps) => {
     const onShow = async () => {
-      const example = await HOC.View.show(
-        ExampleManagerModal,
-        {
-          hideComponent,
-        },
-        "example"
-      );
+      const example = await show(ExampleManagerModal, {
+        hideComponent,
+      });
       console.log({ example });
     };
     return <button onClick={onShow}>show</button>;
