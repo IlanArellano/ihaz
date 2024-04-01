@@ -744,9 +744,7 @@ export type IViewManager = Omit<ViewUncontrolledComp, "Component"> &
   ViewMethods;
 
 export declare type TreeComponent = <IProps = any>(
-  ComponentWithRef: React.ComponentType<
-    IProps & Omit<ViewContextHook, "register" | "unregister">
-  >,
+  ComponentWithRef: React.ComponentType<IProps & ViewContextProps>,
   contextName: string
 ) => (props: IProps) => React.ReactElement;
 
@@ -773,6 +771,8 @@ export interface ViewContextHook {
   showSync: ShowFuncSyncWithoutContext;
   getContext: () => string;
 }
+
+export type ViewContextProps = Omit<ViewContextHook, "register" | "unregister">;
 
 /**Create a view manager that can handle the mount-unmount behavior from the own parent `Tree` component
    * through the `show` and `onClose` methods. Every component is added
