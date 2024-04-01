@@ -1,6 +1,6 @@
 {
   "name": "@ihaz/react-ui-utils",
-  "version": "1.4.0-beta-unstable",
+  "version": "1.4.0",
   "type": "module",
   "engines": {
     "node": ">=16"
