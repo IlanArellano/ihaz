@@ -1,16 +1,11 @@
 import * as React from "react";
 import { createFunctionalInstance } from "./manager";
 import type {
+  ContextManager,
   FunctionalManagerMethods,
   FunctionalMethods,
   MethodsWithStore,
 } from "@utils/types";
-
-interface ContextManager<IMethods extends FunctionalMethods, IProps> {
-  Parent: (props: IProps) => React.ReactNode;
-  isInstanceMounted: () => boolean;
-  managerMethods: IMethods;
-}
 
 export function createFunctionalContextManager<
   IComponent extends (props: P) => React.ReactNode,
@@ -29,13 +24,14 @@ export function createFunctionalContextManager<
   >
 ): ContextManager<IMethods extends FunctionalMethods ? IMethods : {}, P> {
   const methods = {} as IMethods;
+  let instanceMounted: boolean = false;
+  const isInstanceMounted = () => instanceMounted;
   const Component = createFunctionalInstance<IComponent, IMethods, P>(
     Comp,
     methods,
+    isInstanceMounted,
     override
   );
-  let instanceMounted: boolean = false;
-  const isInstanceMounted = () => instanceMounted;
 
   return {
     Parent: (props) => {

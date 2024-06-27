@@ -607,23 +607,16 @@ export type UncontrolledFC = <
 export type MethodsWithStore<IStore extends FunctionalMethods> = {
   [key: string]: (
     get: <IKey extends keyof IStore>(key: IKey) => IStore[IKey],
+    isInstanceMounted: () => boolean,
     ...agrs: any[]
   ) => any;
 };
 
 export interface ContextManager<IMethods extends FunctionalMethods, IProps> {
-  Parent: (props: IProps) => React.ReactElement<IProps>;
+  Parent: (props: IProps) => React.ReactNode;
   isInstanceMounted: () => boolean;
   managerMethods: IMethods;
 }
-
-export type MethodsStored<
-  IMethodInstance extends MethodsWithStore<IMethodInstance>
-> = {
-  [key in keyof IMethodInstance]: (
-    ...args: ParametersWithoutFistParam<IMethodInstance[key]>
-  ) => ReturnType<IMethodInstance[key]>;
-};
 
 export type InstanceMap<IMethods> = Map<
   keyof IMethods,

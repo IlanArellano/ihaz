@@ -20,3 +20,5 @@ export default function UncontrolledFunction({
     </div>
   );
 }
+
+UncontrolledFunction.displayName = "UncontrolledFunction";

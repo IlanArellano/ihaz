@@ -1,6 +1,13 @@
+import { Dispatch, SetStateAction } from "react";
 import { HOC } from "@app/manager";
 
-export default function ControlledFunctionComp() {
+interface ControlledFunctionCompProps {
+  setMount: Dispatch<SetStateAction<boolean>>;
+}
+
+export default function ControlledFunctionComp({
+  setMount,
+}: ControlledFunctionCompProps) {
   const increment = () => {
     HOC.UncontrolledFC.methods.increment();
   };
@@ -16,6 +23,9 @@ export default function ControlledFunctionComp() {
       <button onClick={decrement}>Decrement</button>
       <button onClick={() => toogle(true)}>Show Component</button>
       <button onClick={() => toogle(false)}>Hide Component</button>
+      <button onClick={() => setMount((prev) => !prev)}>
+        toogle component
+      </button>
     </div>
   );
 }

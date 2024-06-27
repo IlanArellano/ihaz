@@ -20,6 +20,7 @@ export function createFunctionalInstance<
 >(
   Comp: IComponent,
   entries: IMethods,
+  isInstanceMounted: () => boolean,
   override?: MethodsWithStore<
     IMethods extends FunctionalMethods ? IMethods : {}
   >
@@ -28,6 +29,9 @@ export function createFunctionalInstance<
   const getMap: () => InstanceMap<IMethods> = CommonObject.createGetterResource(
     () => new Map()
   );
+  const get = <IKey extends keyof IMethods>(key: IKey): IMethods[IKey] => {
+    return getMap().get(key)! as IMethods[IKey];
+  };
   return (props: P) => {
     const set: FunctionalManagerMethods<Methods>["set"] = (key, value) => {
       if (!value || !key) return;
@@ -43,18 +47,23 @@ export function createFunctionalInstance<
       if (entries[key as keyof IMethods]) return;
       Object.assign(entries as object, {
         [key]: function () {
-          const _internalInstance = getMap();
-          const get = <IKey extends keyof IMethods>(
-            key: IKey
-          ): IMethods[IKey] => {
-            return _internalInstance.get(key)! as IMethods[IKey];
-          };
           if (override && override[key as keyof typeof override])
             return override[key as keyof typeof override].call(
               null,
               get,
+              isInstanceMounted,
               ...[].slice.call(arguments)
             );
+          if (!isInstanceMounted()) {
+            const displayName: string = (Comp as any)?.displayName;
+            throw new Error(
+              `Cannot Execute Method '${key as string}' ${
+                displayName
+                  ? `from uncontrolled component '${displayName}'`
+                  : ""
+              } because the Parent component doesn´t exists in React Tree`
+            );
+          }
           const func = get(key as keyof IMethods);
           return (func as Function).apply(null, arguments);
         },
