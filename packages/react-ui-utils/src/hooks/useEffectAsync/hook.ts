@@ -1,25 +1,10 @@
-import { DependencyList, useEffect } from "react";
-import { EffectResult } from "@utils/types";
+import * as React from "react";
 import { createAsyncEffect } from "../shared/effect";
+import type { EffectResult } from "@utils/types";
 
-/**Effect  with same function as `React.useEffect` that can be declared a promise in the callback
- * 
- * ```tsx
- * const Example = () => {
-  const [value, setValue] = useState();
-
-  useEffectAsync(async () => {
-    const api = await fetch("myapi");
-    setValue(api)
-  },[]);
-
-  return <div>{value}</div>
-}
- * ```
- */
 export default function useEffectAsync(
   effect: () => Promise<EffectResult>,
-  deps?: DependencyList
+  deps?: React.DependencyList
 ) {
-  useEffect(createAsyncEffect(effect), deps);
+  React.useEffect(createAsyncEffect(effect), deps);
 }

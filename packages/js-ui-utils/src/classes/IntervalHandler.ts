@@ -1,4 +1,4 @@
-export class IntervalHandler {
+export default class IntervalHandler {
   private interval: number | undefined;
 
   public set = (callback: TimerHandler, ms?: number) => {

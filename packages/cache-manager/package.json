@@ -1,0 +1,28 @@
+{
+  "name": "@ihaz/cache-manager",
+  "version": "1.0.0-alpha",
+  "description": "A cache manager which store items and resources in memory or storage manager",
+  "type": "module",
+  "main": "lib/index.js",
+  "module": "lib/index.es.js",
+  "jsnext:main": "lib/index.es.js",
+  "files": [
+    "lib"
+  ],
+  "scripts": {
+    "build": "rollup -c",
+    "test": "jest --watchAll"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/IlanArellano/ihaz.git"
+  },
+  "engines": {
+    "node": ">=14.0.0"
+  },
+  "keywords": [
+    "cache"
+  ],
+  "author": "Ilan Arellano",
+  "license": "MIT"
+}

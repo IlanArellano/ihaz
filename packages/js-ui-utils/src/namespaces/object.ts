@@ -1,10 +1,9 @@
-import { DeepRecord } from "@utils/types";
-import { Client } from "./client";
+import { DeepRecord, _Object } from "../types";
+import Client from "./client";
 
 type MapObjectOut<T, TOut> = { [K in keyof T]: TOut };
 
-export namespace CommonObject {
-  /**Devuelve un objeto eliminando todas las keys seleccionadas */
+namespace CommonObject {
   export const Omit = <T extends { [k: string]: any }, K extends keyof T>(
     obj: T,
     ...omits: K[]
@@ -13,6 +12,15 @@ export namespace CommonObject {
       const { [curr]: omitted, ...rest } = prev as T;
       return rest;
     }, obj as Omit<T, K>);
+
+  export const Pick = <T extends { [k: string]: any }, K extends keyof T>(
+    obj: T,
+    ...picks: K[]
+  ): Pick<T, K> =>
+    picks.reduce(
+      (prev, curr) => ({ ...prev, [curr]: obj[curr] }),
+      {} as Pick<T, K>
+    );
 
   export function mapObject<T, TOut>(
     obj: T,
@@ -29,19 +37,37 @@ export namespace CommonObject {
   export const createObjectWithGetters = <T extends { [key: string]: any }>(
     obj: T,
     get: (key: keyof T, value: T[keyof T]) => any,
-    excludedKeys?: (keyof T)[]
+    excludedKeys?: (keyof T)[],
+    mutable?: boolean
   ): T => {
-    const newObj = {} as T;
+    const finalObj = mutable ? obj : ({} as T);
     const hasExcluded = Array.isArray(excludedKeys);
 
-    Object.keys(obj).forEach((key) => {
-      Object.defineProperty(newObj, key, {
+    for (let key in obj) {
+      Object.defineProperty(finalObj, key, {
         get: () =>
-          hasExcluded && excludedKeys[key] ? obj[key] : get(key, obj[key]),
+          hasExcluded && excludedKeys.some((x) => x === key)
+            ? obj[key]
+            : get(key, obj[key]),
       });
-    });
+    }
 
-    return newObj;
+    return finalObj;
+  };
+
+  export const createGetterResource = <
+    T extends (...args: any[]) => any,
+    IResult extends T extends (...args: any[]) => infer Res ? Res : never
+  >(
+    func: T
+  ): ((...args: Parameters<T>) => IResult) => {
+    let value: IResult | null = null;
+    return function () {
+      if (value === null) {
+        value = func.apply(null, arguments);
+      }
+      return value!;
+    };
   };
 
   export function ChangeValueFromObject<
@@ -103,6 +129,28 @@ export namespace CommonObject {
     return true;
   };
 
+  export const objectToString = <T extends _Object>(obj: T): string => {
+    if (
+      (typeof obj !== "object" && typeof obj !== "function") ||
+      obj === null
+    ) {
+      return String(obj);
+    }
+    if (typeof obj === "function") {
+      return (obj as Function).toString();
+    }
+    if (Array.isArray(obj)) {
+      return (obj as any[]).map((it) => objectToString(it as T)).join("\n");
+    }
+    const newObj: { [key in keyof T]: string } = {} as {
+      [key in keyof T]: string;
+    };
+    for (let key in obj as T) {
+      newObj[key] = objectToString(obj[key]);
+    }
+    return JSON.stringify(newObj);
+  };
+
   export const DeepCopy = <T>(value: T) =>
     Client.isClientSide()
       ? window.structuredClone(value)
@@ -115,3 +163,5 @@ export namespace CommonObject {
     return JSON.stringify(obj) === "{}";
   };
 }
+
+export default CommonObject;

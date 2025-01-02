@@ -1,9 +1,14 @@
+import Validation from "@jsUtils/namespaces/validation";
 import type { EffectResult } from "@utils/types";
 
 export const createAsyncEffect =
-  (effect: () => Promise<EffectResult>) => () => {
+  (effect: () => Promise<EffectResult> | EffectResult) => () => {
     let res: EffectResult | null = null;
-    effect().then((result) => (res = result));
+    const effectResult = effect();
+    if (Validation.isPromiseLike(effectResult))
+      effectResult.then((result) => (res = result));
+    else res = effectResult;
+
     return () => {
       if (res && typeof res === "function") res();
     };

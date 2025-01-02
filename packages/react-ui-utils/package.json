@@ -1,36 +1,18 @@
 {
   "name": "@ihaz/react-ui-utils",
-  "version": "1.3.0",
-  "description": "A general UI common methods for React Projects, supports React Dom and React Native.",
+  "version": "1.4.1",
   "type": "module",
-  "main": "lib/index.js",
-  "module": "lib/index.es.js",
-  "jsnext:main": "lib/index.es.js",
-  "files": [
-    "lib"
-  ],
   "engines": {
-    "node": ">=14.0.0"
+    "node": ">=16"
   },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/IlanArellano/ihaz.git"
-  },
-  "scripts": {
-    "build": "rollup -c",
-    "test": "jest --watchAll"
-  },
-  "keywords": [
-    "react",
-    "react-utils",
-    "react native"
-  ],
-  "author": "Ilan Arellano",
-  "license": "MIT",
   "peerDependencies": {
     "react": ">=16"
   },
-  "dependencies": {
-    "@ihaz/js-ui-utils": "^1.0.4-alpha"
+  "scripts": {
+    "build": "rollup -c && gulp copy-files",
+    "build:windows": "set NODE_ENV=production&& set INPUT_DIR=src/&& set OUTPUT_DIR=lib/&& npm run build",
+    "build:linux": "NODE_ENV=production && INPUT_DIR=src/ && OUTPUT_DIR=lib/ && npm run build",
+    "build:mac": "export NODE_ENV=production && export INPUT_DIR=src/ && export OUTPUT_DIR=lib/ && npm run build",
+    "test": "jest --watchAll"
   }
 }

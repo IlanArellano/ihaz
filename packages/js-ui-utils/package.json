@@ -1,6 +1,6 @@
 {
   "name": "@ihaz/js-ui-utils",
-  "version": "1.0.4-alpha",
+  "version": "1.0.5-alpha",
   "description": "A general UI common methods for javascript.",
   "type": "module",
   "main": "lib/index.js",
