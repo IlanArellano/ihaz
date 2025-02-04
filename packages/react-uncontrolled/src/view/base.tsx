@@ -10,20 +10,18 @@ import {
   EventHandler,
   ShowFuncSync,
   ConditionView,
+  VIEW_NATIVE_EVENTS,
 } from "@pkg/types";
 import { ViewMainComponent } from "./comp";
-import Stack from "@jsUtils/namespaces/stack";
-
-export const VIEW_TREE_EVENT = "close";
 
 export function BaseView({
   set,
   getTree,
 }: FunctionalManagerMethods<ViewUncontrolledComp> & ViewManagerComponentProps) {
   const [state, setState] = React.useState<ViewComponentProps>(() => ({
-    nextId: 0,
     views: [],
   }));
+  const nextIdRef = React.useRef(0);
 
   const removeEntry = React.useCallback((id: number) => {
     setState((prev) => ({
@@ -41,11 +39,23 @@ export function BaseView({
     []
   );
 
+  const clearEvents = React.useCallback(
+    (context?: React.Key) => {
+      const tree = getTree();
+      let handler: EventHandler<EventHandlerRegisterMapping> | undefined;
+      if (context && (handler = tree.getComponentHandler(context))) {
+        handler.clearByEvent(VIEW_NATIVE_EVENTS.CLOSE);
+      }
+    },
+    [getTree]
+  );
+
   const addEntry = React.useCallback((entry: ViewEntry) => {
     setState((prev) => ({
       views: prev.views.concat(entry),
-      nextId: prev.nextId + 1,
     }));
+    if (entry.id >= nextIdRef.current)
+      nextIdRef.current = nextIdRef.current + 1; //if a view is reopened prevents to increment the id view counter
   }, []);
 
   const startView = React.useCallback(
@@ -56,7 +66,7 @@ export function BaseView({
         if (componentStatus === "mounted") {
           const handler = tree.getComponentHandler(context);
           addEntry(entry);
-          handler.suscribe(VIEW_TREE_EVENT, () => {
+          handler.suscribe(VIEW_NATIVE_EVENTS.CLOSE, () => {
             handleClose(entry.id, resolve)(entry.props.defaultValue);
           });
         } else {
@@ -73,23 +83,17 @@ export function BaseView({
   );
 
   const showAsync: ShowFuncAsync = React.useCallback(
-    (render, props, context) => {
+    ({ children, context, props }) => {
       return new Promise((resolve) => {
-        const currId = state.nextId;
-        const tree = getTree();
+        const currId = nextIdRef.current;
 
         const entry: ViewEntry = {
           id: currId,
-          render,
+          children,
           props: {
             onClose: (result: any) => {
               handleClose(currId, resolve)(result);
-              let handler:
-                | EventHandler<EventHandlerRegisterMapping>
-                | undefined;
-              if (context && (handler = tree.getComponentHandler(context))) {
-                handler.clearByEvent(VIEW_TREE_EVENT);
-              }
+              clearEvents(context);
             },
             ...(props || {}),
           },
@@ -102,30 +106,25 @@ export function BaseView({
   );
 
   const show: ShowFuncSync = React.useCallback(
-    (render, props, onCloseListener, context) => {
-      const currId = state.nextId;
-      const tree = getTree();
+    ({ children, props, onCloseListener, context }) => {
+      const currId = nextIdRef.current;
 
       const entry: ViewEntry = {
         id: currId,
-        render,
+        children,
         props: {
           ...(props || {}),
           onClose: (res) => {
-            handleClose(currId);
-            let handler: EventHandler<EventHandlerRegisterMapping> | undefined;
-            if (context && (handler = tree.getComponentHandler(context))) {
-              handler.clearByEvent(VIEW_TREE_EVENT);
-            }
+            handleClose(currId)(undefined);
+            clearEvents(context);
             if (onCloseListener) onCloseListener(res as never);
           },
         },
       };
 
       return {
-        start: (options) => {
-          if (!options?.delay) return startView(entry, context);
-          Stack.Sleep(options.delay).then(() => startView(entry, context));
+        start: () => {
+          startView(entry, context);
         },
         close: () => {
           handleClose(entry.id);
@@ -152,5 +151,5 @@ export function BaseView({
   set("showAsync", showAsync);
   set("removeEntries", removeEntries);
 
-  return <ViewMainComponent {...state} />;
+  return <ViewMainComponent views={state.views} />;
 }

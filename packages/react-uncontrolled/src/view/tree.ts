@@ -1,11 +1,10 @@
 import EventHandler from "@jsUtils/classes/EventHandler";
-import type {
-  ComponentRegister,
-  EventHandlerRegisterMapping,
-  Status,
+import {
+  VIEW_NATIVE_EVENTS,
+  type ComponentRegister,
+  type EventHandlerRegisterMapping,
+  type Status,
 } from "@pkg/types";
-
-export const VIEW_TREE_EVENT = "close";
 
 export class ViewTree {
   private componentMountEvents: Map<
@@ -33,8 +32,8 @@ export class ViewTree {
     if (entry.status === "unmounted") {
       const MountRef = this.getComponentHandler(entry.key);
       if (MountRef) {
-        MountRef.listen(VIEW_TREE_EVENT);
-        MountRef.clearByEvent(VIEW_TREE_EVENT);
+        MountRef.listen(VIEW_NATIVE_EVENTS.CLOSE);
+        MountRef.clearByEvent(VIEW_NATIVE_EVENTS.CLOSE);
       }
     }
   }
