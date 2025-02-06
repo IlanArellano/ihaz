@@ -30,7 +30,7 @@ declare abstract class BaseHandler<T> {
   protected abstract value: T;
 
   /**
-   * @deprecated
+   * @deprecated This method dosent works in most of cases, recommed use other alternatives
    *
    */
   public getDeepCopy(): T;
@@ -135,6 +135,50 @@ export type MethodsWithInstance<IComponent> = {
   [key: string]: (instance: () => IComponent, ...agrs: any[]) => any;
 };
 
+export type UncontrolledInstanceProps = {
+  key: symbol;
+  /**Indicates whether the instance is global. Components are global when dont have declared a children */
+  isGlobal: boolean;
+};
+
+export type UncontrolledInstanceCount = {
+  globals: number;
+  parents: number;
+};
+
+export type UncontrolledGlobalProps = {
+  count: UncontrolledInstanceCount;
+  instanceProps: Map<symbol, UncontrolledInstanceProps>;
+  currentSeq: number;
+  name: string;
+};
+
+export type UncontrolledMainContextProviderProps = {
+  globalProps: UncontrolledGlobalProps;
+};
+
+export type UncontrolledMainContextProps = {
+  getKey: () => symbol;
+  generateKey: () => symbol;
+  getInternalProps: () => UncontrolledInstanceProps | null;
+  setInternalProps: (props: Omit<UncontrolledInstanceProps, "key">) => void;
+  registerInstance: (type: keyof UncontrolledInstanceCount) => void;
+  unregisterInstance: (type: keyof UncontrolledInstanceCount) => void;
+  getGlobalInstancesCount: () => UncontrolledInstanceCount;
+};
+
+export type UncontrolledStoredContextProps = {
+  getMethodEntry: <IKey extends keyof FunctionalMethods>(
+    key: IKey
+  ) => FunctionalMethods[IKey];
+  setMethodEntry: <IKey extends keyof FunctionalMethods>(
+    key: IKey,
+    value: FunctionalMethods[IKey]
+  ) => void;
+  suscribeWatchValue: (name: string, fn: (value: any) => void) => () => void;
+  emitWatchValue: (name: string, value: any) => void;
+};
+
 export type UncontrolledComponentResult<P = {}> = {
   Component: (props: P) => React.ReactElement<P>;
   isMounted: () => boolean;
@@ -153,10 +197,8 @@ export type UncontrolledComponent = <
     ? Omit<IProps, keyof FunctionalManagerMethods<any>>
     : {}
 >(
-  Comp: IComponent,
-  override?: MethodsWithStore<
-    IMethods extends FunctionalMethods ? IMethods : {}
-  >
+  Comp: IComponent | React.ReactNode,
+  options?: UncontrolledManagerOptions<IMethods>
 ) => { methods: IMethods } & Omit<UncontrolledComponentResult<P>, "getStore">;
 
 export type MethodsWithStore<IStore extends FunctionalMethods> = {
@@ -182,10 +224,20 @@ export type FunctionalMethods = {
   [key: string | number | symbol]: (...args: any[]) => any;
 };
 
-export interface FunctionalManagerMethods<IMethods extends FunctionalMethods> {
+export interface FunctionalManagerMethods<
+  IMethods extends FunctionalMethods,
+  IWatchers extends string = string
+> {
   set: <IKey extends keyof IMethods>(key: IKey, value: IMethods[IKey]) => void;
-  watch: (watcher: any) => void;
+  watch: (watcher: IWatchers, value: any) => void;
 }
+
+export type UncontrolledManagerOptions<IMethods> = Partial<{
+  name: string;
+  override: MethodsWithStore<
+    IMethods extends FunctionalMethods ? IMethods : {}
+  >;
+}>;
 
 export const createUncontrolledComponent: UncontrolledComponent;
 

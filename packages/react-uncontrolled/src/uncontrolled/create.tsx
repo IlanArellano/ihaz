@@ -4,44 +4,46 @@ import type {
   ContextManager,
   FunctionalManagerMethods,
   FunctionalMethods,
-  MethodsWithStore,
+  UncontrolledManagerOptions,
 } from "@pkg/types";
+import { createUncontrolledGlobalProps } from "./init";
+import { UncontrolledMainContextProvider } from "./context/main";
+import { UncontrolledStoredContextProvider } from "./context/stored";
 
 export function createFunctionalContextManager<
-  IComponent extends (props: P) => React.ReactNode,
-  IMethods = IComponent extends (props: infer IProps) => React.ReactNode
+  IComponent extends React.ComponentType<P & FunctionalManagerMethods<any>>,
+  IMethods = IComponent extends React.ComponentType<infer IProps>
     ? IProps extends FunctionalManagerMethods<infer Methods>
       ? Methods
       : {}
     : {},
-  P = IComponent extends (props: infer IProps) => React.ReactNode
+  P = IComponent extends React.ComponentType<infer IProps>
     ? Omit<IProps, keyof FunctionalManagerMethods<any>>
     : {}
 >(
-  Comp: IComponent,
-  override?: MethodsWithStore<
-    IMethods extends FunctionalMethods ? IMethods : {}
-  >
+  Comp: IComponent | React.ReactNode,
+  options?: UncontrolledManagerOptions<IMethods>
 ): ContextManager<IMethods extends FunctionalMethods ? IMethods : {}, P> {
   const methods = {} as IMethods;
   let instanceMounted: boolean = false;
   const isInstanceMounted = () => instanceMounted;
-  const Component = createFunctionalInstance<IComponent, IMethods, P>(
+  const globalProps = createUncontrolledGlobalProps(Comp, options?.name);
+  const InstanceComponent = createFunctionalInstance<IComponent, IMethods, P>(
     Comp,
     methods,
     isInstanceMounted,
-    override
+    options?.override
   );
 
   return {
     Parent: (props) => {
-      React.useEffect(() => {
-        instanceMounted = true;
-        return () => {
-          instanceMounted = false;
-        };
-      }, []);
-      return <Component {...(props as JSX.IntrinsicAttributes & P)} />;
+      return (
+        <UncontrolledMainContextProvider globalProps={globalProps}>
+          <UncontrolledStoredContextProvider>
+            <InstanceComponent {...(props as JSX.IntrinsicAttributes & P)} />
+          </UncontrolledStoredContextProvider>
+        </UncontrolledMainContextProvider>
+      );
     },
     managerMethods: methods as IMethods extends FunctionalMethods
       ? IMethods

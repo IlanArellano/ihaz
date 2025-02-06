@@ -4,11 +4,11 @@ import type { UncontrolledComponent } from "@pkg/types";
 const isFunctionalComponent = (component: any) =>
   typeof component === "function" && !component.prototype.isReactComponent;
 
-const createUncontrolledComponent: UncontrolledComponent = (Comp, override) => {
+const createUncontrolledComponent: UncontrolledComponent = (Comp, options) => {
   if (!isFunctionalComponent(Comp))
     throw new Error("this Method only allows functional components.");
 
-  const context = createFunctionalContextManager(Comp as any, override);
+  const context = createFunctionalContextManager(Comp as any, options);
 
   return {
     Component: context.Parent,

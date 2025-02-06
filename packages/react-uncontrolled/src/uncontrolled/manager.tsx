@@ -1,24 +1,24 @@
 import * as React from "react";
-import CommonObject from "@jsUtils/namespaces/object";
 import type {
   FunctionalManagerMethods,
   FunctionalMethods,
-  InstanceMap,
   MethodsWithStore,
 } from "@pkg/types";
+import { UncontrolledPropsContextProvider } from "./context/props";
+import { useUncontrolledStore } from "./hooks/useUncontrolledStore";
 
 export function createFunctionalInstance<
-  IComponent extends (props: P) => React.ReactNode,
-  IMethods = IComponent extends (props: infer IProps) => React.ReactNode
+  IComponent extends React.ComponentType<P & FunctionalManagerMethods<any>>,
+  IMethods = IComponent extends React.ComponentType<infer IProps>
     ? IProps extends FunctionalManagerMethods<infer Methods>
       ? Methods
       : {}
     : {},
-  P = IComponent extends (props: infer IProps) => React.ReactNode
+  P = IComponent extends React.ComponentType<infer IProps>
     ? Omit<IProps, keyof FunctionalManagerMethods<any>>
     : {}
 >(
-  Comp: IComponent,
+  Comp: IComponent | React.ReactNode,
   entries: IMethods,
   isInstanceMounted: () => boolean,
   override?: MethodsWithStore<
@@ -26,13 +26,10 @@ export function createFunctionalInstance<
   >
 ) {
   type Methods = IMethods extends FunctionalMethods ? IMethods : {};
-  const getMap: () => InstanceMap<IMethods> = CommonObject.createGetterResource(
-    () => new Map()
-  );
-  const get = <IKey extends keyof IMethods>(key: IKey): IMethods[IKey] => {
-    return getMap().get(key)! as IMethods[IKey];
-  };
+
   return (props: P) => {
+    const storedCtx = useUncontrolledStore(true);
+
     const set: FunctionalManagerMethods<Methods>["set"] = React.useCallback(
       (key, value) => {
         if (!value || !key) return;
@@ -42,16 +39,15 @@ export function createFunctionalInstance<
               Array.isArray(value) ? "array" : typeof value
             } type`
           );
-        const _map = getMap();
 
-        _map.set(key as any, value as any);
+        storedCtx.setMethodEntry(key, value);
         if (entries[key as keyof IMethods]) return;
         Object.assign(entries as object, {
           [key]: function () {
             if (override && override[key as keyof typeof override])
               return override[key as keyof typeof override].call(
                 null,
-                get,
+                storedCtx.getMethodEntry,
                 isInstanceMounted,
                 ...[].slice.call(arguments)
               );
@@ -65,7 +61,7 @@ export function createFunctionalInstance<
                 } because the Parent component doesn´t exists in React Tree`
               );
             }
-            const func = get(key as keyof IMethods);
+            const func = storedCtx.getMethodEntry(key as keyof IMethods);
             return (func as Function).apply(null, arguments);
           },
         });
@@ -73,11 +69,18 @@ export function createFunctionalInstance<
       []
     );
 
+    const watch = React.useCallback((watcher: string, value: any) => {
+      storedCtx.emitWatchValue(watcher, value);
+    }, []);
+
     return (
-      <>
-        {/* @ts-ignore */}
-        <Comp {...props} set={set} />
-      </>
+      <UncontrolledPropsContextProvider set={set} watch={watch}>
+        {typeof Comp === "function" ? (
+          <Comp {...props} set={set} watch={watch} />
+        ) : (
+          Comp
+        )}
+      </UncontrolledPropsContextProvider>
     );
   };
 }
