@@ -40,8 +40,8 @@ class Logger {
     }
   };
 
-  throwable = (message: string) => {
-    throw new Error(this.prefix + message);
+  throwable = (...messages: string[]) => {
+    throw new Error(this.prefix + [].join.call(messages, ""));
   };
 
   private canWrite(level: keyof typeof LogLevel): boolean {

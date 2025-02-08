@@ -8,7 +8,12 @@ export function useUncontrolledProps<IMethods extends FunctionalMethods>() {
     UncontrolledPropsContext
   ) as FunctionalManagerMethods<IMethods>;
 
-  uncontrolledContextInvariant(ctx, "useUncontrolledProps");
+  uncontrolledContextInvariant(
+    ctx,
+    "useUncontrolledProps",
+    true,
+    "This context only can be used in component that becomes in uncontrolled components"
+  );
 
   return ctx;
 }

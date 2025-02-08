@@ -6,6 +6,7 @@ import type {
 } from "@pkg/types";
 import { UncontrolledPropsContextProvider } from "./context/props";
 import { useUncontrolledStore } from "./hooks/useUncontrolledStore";
+import UncontrolledMainManager from "./components/UncontrolledMainManager";
 
 export function createFunctionalInstance<
   IComponent extends React.ComponentType<P & FunctionalManagerMethods<any>>,
@@ -75,11 +76,13 @@ export function createFunctionalInstance<
 
     return (
       <UncontrolledPropsContextProvider set={set} watch={watch}>
-        {typeof Comp === "function" ? (
-          <Comp {...props} set={set} watch={watch} />
-        ) : (
-          Comp
-        )}
+        <UncontrolledMainManager>
+          {typeof Comp === "function" ? (
+            <Comp {...props} set={set} watch={watch} />
+          ) : (
+            Comp
+          )}
+        </UncontrolledMainManager>
       </UncontrolledPropsContextProvider>
     );
   };
