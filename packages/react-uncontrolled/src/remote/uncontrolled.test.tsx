@@ -1,16 +1,16 @@
 import React, { useState } from "react";
 import { act, render, screen } from "@testing-library/react";
-import createUncontrolledFC from "./comp";
+import createRemoteComponent from "./comp";
 import "@testing-library/jest-dom";
 import type { FunctionalManagerMethods } from "@pkg/types";
 import { remoteMethods } from "@pkg/common/methods";
 
-type IUncontrolledMethods = {
+type IRemoteMethods = {
   getCounter: () => number;
   setCounter: (counter: number) => void;
 };
 
-const Example = ({ set }: FunctionalManagerMethods<IUncontrolledMethods>) => {
+const Example = ({ set }: FunctionalManagerMethods<IRemoteMethods>) => {
   const [counter, setCounter] = useState(1);
 
   set("getCounter", () => counter);
@@ -20,7 +20,7 @@ const Example = ({ set }: FunctionalManagerMethods<IUncontrolledMethods>) => {
 };
 
 describe("render functionComponentManager", () => {
-  const manager = createUncontrolledFC(Example);
+  const manager = createRemoteComponent(Example);
 
   it("should render by default", () => {
     render(<manager.Component />);

@@ -6,7 +6,7 @@ import {
   ViewComponentProps,
   ViewEntry,
   ViewManagerComponentProps,
-  ViewUncontrolledComp,
+  ViewRemoteComp,
   EventHandler,
   ShowFuncSync,
   ConditionView,
@@ -17,7 +17,7 @@ import { ViewMainComponent } from "./comp";
 export function BaseView({
   set,
   getTree,
-}: FunctionalManagerMethods<ViewUncontrolledComp> & ViewManagerComponentProps) {
+}: FunctionalManagerMethods<ViewRemoteComp> & ViewManagerComponentProps) {
   const [state, setState] = React.useState<ViewComponentProps>(() => ({
     views: [],
   }));

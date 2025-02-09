@@ -1,11 +1,8 @@
 import * as React from "react";
-import {
-  ViewUncontrolledCompWithoutChildren,
-  WithShowViewOptions,
-} from "@pkg/types";
+import { ViewRemoteCompWithoutChildren, WithShowViewOptions } from "@pkg/types";
 
 const ShowViewCompManager = React.forwardRef<
-  ViewUncontrolledCompWithoutChildren,
+  ViewRemoteCompWithoutChildren,
   Omit<WithShowViewOptions, "local">
 >(({ manager, children }, ref) => {
   React.useImperativeHandle(

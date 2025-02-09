@@ -1,28 +1,27 @@
 import * as React from "react";
 import type {
-  UncontrolledInstanceCount,
-  UncontrolledInstanceProps,
-  UncontrolledMainContextProps,
-  UncontrolledMainContextProviderProps,
+  RemoteInstanceCount,
+  RemoteInstanceProps,
+  RemoteMainContextProps,
+  RemoteMainContextProviderProps,
 } from "@pkg/types";
 
-export const UncontrolledMainContext =
-  React.createContext<UncontrolledMainContextProps>(
-    undefined as unknown as UncontrolledMainContextProps
-  );
+export const RemoteMainContext = React.createContext<RemoteMainContextProps>(
+  undefined as unknown as RemoteMainContextProps
+);
 
-export function UncontrolledMainContextProvider({
+export function RemoteMainContextProvider({
   globalProps,
   children,
-}: React.PropsWithChildren<UncontrolledMainContextProviderProps>) {
+}: React.PropsWithChildren<RemoteMainContextProviderProps>) {
   const keyRef = React.useRef<symbol | null>(null);
-  const internalProps = React.useRef<UncontrolledInstanceProps | null>(null);
+  const internalProps = React.useRef<RemoteInstanceProps | null>(null);
 
   const getInternalProps = React.useCallback(() => internalProps.current, []);
 
   const setInternalProps = React.useCallback(
-    (props: Omit<UncontrolledInstanceProps, "key">) => {
-      const final: UncontrolledInstanceProps = {
+    (props: Omit<RemoteInstanceProps, "key">) => {
+      const final: RemoteInstanceProps = {
         ...props,
         key: keyRef.current!,
       };
@@ -44,14 +43,14 @@ export function UncontrolledMainContextProvider({
   }, []);
 
   const registerInstance = React.useCallback(
-    (type: keyof UncontrolledInstanceCount) => {
+    (type: keyof RemoteInstanceCount) => {
       globalProps.count[type]++;
     },
     [globalProps]
   );
 
   const unregisterInstance = React.useCallback(
-    (type: keyof UncontrolledInstanceCount) => {
+    (type: keyof RemoteInstanceCount) => {
       globalProps.count[type]--;
     },
     [globalProps]
@@ -62,7 +61,7 @@ export function UncontrolledMainContextProvider({
   }, [globalProps]);
 
   return (
-    <UncontrolledMainContext.Provider
+    <RemoteMainContext.Provider
       value={{
         getKey,
         setInternalProps,
@@ -74,6 +73,6 @@ export function UncontrolledMainContextProvider({
       }}
     >
       {children}
-    </UncontrolledMainContext.Provider>
+    </RemoteMainContext.Provider>
   );
 }

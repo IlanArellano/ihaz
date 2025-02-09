@@ -4,11 +4,11 @@ import type {
   ContextManager,
   FunctionalManagerMethods,
   FunctionalMethods,
-  UncontrolledManagerOptions,
+  RemoteManagerOptions,
 } from "@pkg/types";
-import { createUncontrolledGlobalProps } from "./init";
-import { UncontrolledMainContextProvider } from "./context/main";
-import { UncontrolledStoredContextProvider } from "./context/stored";
+import { createRemoteGlobalProps } from "./init";
+import { RemoteMainContextProvider } from "./context/main";
+import { RemoteStoredContextProvider } from "./context/stored";
 
 export function createFunctionalContextManager<
   IComponent extends React.ComponentType<P & FunctionalManagerMethods<any>>,
@@ -22,12 +22,12 @@ export function createFunctionalContextManager<
     : {}
 >(
   Comp: IComponent | React.ReactNode,
-  options?: UncontrolledManagerOptions<IMethods>
+  options?: RemoteManagerOptions<IMethods>
 ): ContextManager<IMethods extends FunctionalMethods ? IMethods : {}, P> {
   const methods = {} as IMethods;
   let instanceMounted: boolean = false;
   const isInstanceMounted = () => instanceMounted;
-  const globalProps = createUncontrolledGlobalProps(Comp, options?.name);
+  const globalProps = createRemoteGlobalProps(Comp, options?.name);
   const InstanceComponent = createFunctionalInstance<IComponent, IMethods, P>(
     Comp,
     methods,
@@ -38,11 +38,11 @@ export function createFunctionalContextManager<
   return {
     Parent: (props) => {
       return (
-        <UncontrolledMainContextProvider globalProps={globalProps}>
-          <UncontrolledStoredContextProvider>
+        <RemoteMainContextProvider globalProps={globalProps}>
+          <RemoteStoredContextProvider>
             <InstanceComponent {...(props as JSX.IntrinsicAttributes & P)} />
-          </UncontrolledStoredContextProvider>
-        </UncontrolledMainContextProvider>
+          </RemoteStoredContextProvider>
+        </RemoteMainContextProvider>
       );
     },
     managerMethods: methods as IMethods extends FunctionalMethods

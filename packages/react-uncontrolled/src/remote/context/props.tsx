@@ -1,17 +1,17 @@
 import * as React from "react";
 import type { FunctionalManagerMethods, FunctionalMethods } from "@pkg/types";
 
-export const UncontrolledPropsContext = React.createContext<
+export const RemotePropsContext = React.createContext<
   FunctionalManagerMethods<FunctionalMethods>
 >(undefined as unknown as FunctionalManagerMethods<FunctionalMethods>);
 
-export function UncontrolledPropsContextProvider({
+export function RemotePropsContextProvider({
   children,
-  ...uncontrolledProps
+  ...remoteProps
 }: React.PropsWithChildren<FunctionalManagerMethods<FunctionalMethods>>) {
   return (
-    <UncontrolledPropsContext.Provider value={{ ...uncontrolledProps }}>
+    <RemotePropsContext.Provider value={remoteProps}>
       {children}
-    </UncontrolledPropsContext.Provider>
+    </RemotePropsContext.Provider>
   );
 }

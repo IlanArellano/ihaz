@@ -1,11 +1,11 @@
 import * as React from "react";
-import { useUncontrolledMainComponent } from "../hooks/useUncontrolledMainComponent";
+import { useRemoteMainComponent } from "../hooks/useRemoteMainComponent";
 import { logger } from "@pkg/common/logger";
 
-export default function UncontrolledMainManager({
+export default function RemoteMainManager({
   children,
 }: React.PropsWithChildren): React.JSX.Element {
-  const ctx = useUncontrolledMainComponent(true);
+  const ctx = useRemoteMainComponent(true);
 
   React.useEffect(() => {
     return () => {
@@ -33,7 +33,7 @@ export default function UncontrolledMainManager({
     } else {
       if (currentProps && currentProps.isGlobal)
         logger.debug(
-          "Remove a children from your uncontrolled component instance having a content children previusly can make some issues in the app."
+          "Remove a children from your remote component instance having a content children previusly can make some issues in the app."
         );
       ctx.registerInstance("parents");
       if (ctx.getKey() !== null) ctx.unregisterInstance("globals"); //it means whether the instance has been rendered in React Tree, change the instance status

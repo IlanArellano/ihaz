@@ -4,12 +4,12 @@ import type {
   ShowFuncSyncWithoutContext,
   ViewContextHook,
   ViewTree,
-  ViewUncontrolledComp,
+  ViewRemoteComp,
 } from "@pkg/types";
 import { CHANGE_CONTEXT_NAME_ERROR, NO_REGISTER_ERROR } from "../constants";
 
 export default function createViewContextHook(
-  getMethods: () => ViewUncontrolledComp,
+  getMethods: () => ViewRemoteComp,
   getTree: () => ViewTree
 ) {
   return (contextName: string): ViewContextHook => {

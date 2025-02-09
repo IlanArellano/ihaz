@@ -1,6 +1,6 @@
 import { logger } from "./logger";
 
-export function uncontrolledContextInvariant(
+export function remoteContextInvariant(
   context: any,
   name: string,
   internal?: boolean,
@@ -11,7 +11,7 @@ export function uncontrolledContextInvariant(
       name,
       throwableMessage
         ? throwableMessage
-        : "Uncontrolled context not found. This hook only works in children components from the uncontrolled parent component or view manager"
+        : "Remote context not found. This hook only works in children components from the remote parent component or view manager"
     );
 
   if (!internal) {

@@ -1,7 +1,7 @@
 import * as React from "react";
-import type { UncontrolledGlobalProps } from "@pkg/types";
+import type { RemoteGlobalProps } from "@pkg/types";
 
-const UNCONTROLLED_KEY_PREFIX = "uncontrolled_instance_";
+const REMOTE_KEY_PREFIX = "remote_instance_";
 
 function getComponentName(
   Comp: React.ComponentType<any> | React.ReactNode,
@@ -23,14 +23,14 @@ function generateName(
 ) {
   const name = getComponentName(Comp, defaultName);
 
-  return UNCONTROLLED_KEY_PREFIX.concat(name);
+  return REMOTE_KEY_PREFIX.concat(name);
 }
 
-export function createUncontrolledGlobalProps(
+export function createRemoteGlobalProps(
   Comp: React.ComponentType<any> | React.ReactNode,
   defaultName?: string
-): UncontrolledGlobalProps {
-  const props: UncontrolledGlobalProps = {
+): RemoteGlobalProps {
+  const props: RemoteGlobalProps = {
     count: {
       globals: 0,
       parents: 0,

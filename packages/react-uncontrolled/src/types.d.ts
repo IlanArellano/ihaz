@@ -130,44 +130,44 @@ export class ViewTree {
   ): EventHandler<EventHandlerRegisterMapping>;
 }
 
-//Uncontrolled Components
+//Remote Components
 export type MethodsWithInstance<IComponent> = {
   [key: string]: (instance: () => IComponent, ...agrs: any[]) => any;
 };
 
-export type UncontrolledInstanceProps = {
+export type RemoteInstanceProps = {
   key: symbol;
   /**Indicates whether the instance is global. Components are global when dont have declared a children */
   isGlobal: boolean;
 };
 
-export type UncontrolledInstanceCount = {
+export type RemoteInstanceCount = {
   globals: number;
   parents: number;
 };
 
-export type UncontrolledGlobalProps = {
-  count: UncontrolledInstanceCount;
-  instanceProps: Map<symbol, UncontrolledInstanceProps>;
+export type RemoteGlobalProps = {
+  count: RemoteInstanceCount;
+  instanceProps: Map<symbol, RemoteInstanceProps>;
   currentSeq: number;
   name: string;
 };
 
-export type UncontrolledMainContextProviderProps = {
-  globalProps: UncontrolledGlobalProps;
+export type RemoteMainContextProviderProps = {
+  globalProps: RemoteGlobalProps;
 };
 
-export type UncontrolledMainContextProps = {
+export type RemoteMainContextProps = {
   getKey: () => symbol;
   generateKey: () => symbol;
-  getInternalProps: () => UncontrolledInstanceProps | null;
-  setInternalProps: (props: Omit<UncontrolledInstanceProps, "key">) => void;
-  registerInstance: (type: keyof UncontrolledInstanceCount) => void;
-  unregisterInstance: (type: keyof UncontrolledInstanceCount) => void;
-  getGlobalInstancesCount: () => UncontrolledInstanceCount;
+  getInternalProps: () => RemoteInstanceProps | null;
+  setInternalProps: (props: Omit<RemoteInstanceProps, "key">) => void;
+  registerInstance: (type: keyof RemoteInstanceCount) => void;
+  unregisterInstance: (type: keyof RemoteInstanceCount) => void;
+  getGlobalInstancesCount: () => RemoteInstanceCount;
 };
 
-export type UncontrolledStoredContextProps = {
+export type RemoteStoredContextProps = {
   getMethodEntry: <IKey extends keyof FunctionalMethods>(
     key: IKey
   ) => FunctionalMethods[IKey];
@@ -179,13 +179,13 @@ export type UncontrolledStoredContextProps = {
   emitWatchValue: (name: string, value: any) => void;
 };
 
-export type UncontrolledComponentResult<P = {}> = {
+export type RemoteComponentResult<P = {}> = {
   Component: (props: P) => React.ReactElement<P>;
   isMounted: () => boolean;
 };
 
 export type RemoteInstance<IMethods extends FunctionalMethods, P> = Omit<
-  UncontrolledComponentResult<P>,
+  RemoteComponentResult<P>,
   "getStore"
 > & {
   getMethods: () => IMethods;
@@ -200,7 +200,7 @@ export type RemoteInstanceIntrisic<
   };
 };
 
-export type UncontrolledComponent = <
+export type RemoteComponent = <
   IComponent extends React.ComponentType<any>,
   IMethods extends FunctionalMethods = IComponent extends React.ComponentType<
     infer IProps
@@ -214,7 +214,7 @@ export type UncontrolledComponent = <
     : {}
 >(
   Comp: IComponent | React.ReactNode,
-  options?: UncontrolledManagerOptions<IMethods>
+  options?: RemoteManagerOptions<IMethods>
 ) => RemoteInstance<IMethods, P>;
 
 export type MethodsWithStore<IStore extends FunctionalMethods> = {
@@ -248,14 +248,14 @@ export interface FunctionalManagerMethods<
   watch: (watcher: IWatchers, value: any) => void;
 }
 
-export type UncontrolledManagerOptions<IMethods> = Partial<{
+export type RemoteManagerOptions<IMethods> = Partial<{
   name: string;
   override: MethodsWithStore<
     IMethods extends FunctionalMethods ? IMethods : {}
   >;
 }>;
 
-export const createUncontrolledComponent: UncontrolledComponent;
+export const createRemoteComponent: RemoteComponent;
 
 //createViewManager
 export type OnCloseResult<T> = (result?: T) => void;
@@ -345,19 +345,19 @@ export interface ViewManagerComponentProps {
   getTree: () => ViewTree;
 }
 
-export type ViewUncontrolledExtraProps = {
+export type ViewRemoteExtraProps = {
   removeEntries: (condition?: ConditionView) => void;
 };
 
-export type ViewUncontrolledComp = {
+export type ViewRemoteComp = {
   showAsync: ShowFuncAsync;
   show: ShowFuncSync;
-} & ViewUncontrolledExtraProps;
+} & ViewRemoteExtraProps;
 
-export type ViewUncontrolledCompWithoutChildren = {
+export type ViewRemoteCompWithoutChildren = {
   showAsync: ShowFuncAsyncWithoutChildren;
   show: ShowFuncSyncWithoutChildren;
-} & ViewUncontrolledExtraProps;
+} & ViewRemoteExtraProps;
 
 export type LocalShowViewResult = {
   showAsync: ShowFuncAsyncOnlyChildren;
@@ -377,11 +377,11 @@ export interface ViewMethods {
   /**Component tha handle the `View Manager` inside the UI */
   ShowView: React.ForwardRefExoticComponent<
     Omit<WithShowViewOptions, "manager"> &
-      React.RefAttributes<ViewUncontrolledCompWithoutChildren>
+      React.RefAttributes<ViewRemoteCompWithoutChildren>
   >;
 }
 
-export type IViewManager = ViewUncontrolledComp & ViewMethods;
+export type IViewManager = ViewRemoteComp & ViewMethods;
 
 export enum VIEW_NATIVE_EVENTS {
   CLOSE = "close",

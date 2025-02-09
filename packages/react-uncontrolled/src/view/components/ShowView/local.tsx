@@ -1,12 +1,9 @@
 import * as React from "react";
-import {
-  ViewUncontrolledCompWithoutChildren,
-  WithShowViewOptions,
-} from "@pkg/types";
+import { ViewRemoteCompWithoutChildren, WithShowViewOptions } from "@pkg/types";
 import useLocalShowView from "../../hook/useLocalShowView";
 
 const ShowViewCompLocal = React.forwardRef<
-  ViewUncontrolledCompWithoutChildren,
+  ViewRemoteCompWithoutChildren,
   Omit<WithShowViewOptions, "local" | "manager">
 >(({ children }, ref) => {
   const localProps = useLocalShowView();

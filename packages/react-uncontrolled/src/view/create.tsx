@@ -5,10 +5,10 @@ import CommonObject from "@jsUtils/namespaces/object";
 import type {
   IViewManager,
   ViewTree as ViewTreeType,
-  ViewUncontrolledComp,
+  ViewRemoteComp,
 } from "@pkg/types";
 import createViewContextHook from "./hook/create";
-import createUncontrolledComponent from "@pkg/uncontrolled/comp";
+import createRemoteComponent from "@pkg/remote/comp";
 import { BaseView } from "./base";
 import { createShowView } from "./hocs/withShowView";
 
@@ -21,10 +21,9 @@ export default function createViewManager(): IViewManager {
     createTree
   ) as unknown as () => ViewTreeType;
 
-  const remote = createUncontrolledComponent<
-    typeof BaseView,
-    ViewUncontrolledComp
-  >(BaseView);
+  const remote = createRemoteComponent<typeof BaseView, ViewRemoteComp>(
+    BaseView
+  );
 
   const useViewContext = createViewContextHook(remote.getMethods, getTree);
 

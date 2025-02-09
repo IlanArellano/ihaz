@@ -4,9 +4,9 @@ import type {
   FunctionalMethods,
   MethodsWithStore,
 } from "@pkg/types";
-import { UncontrolledPropsContextProvider } from "./context/props";
-import { useUncontrolledStore } from "./hooks/useUncontrolledStore";
-import UncontrolledMainManager from "./components/UncontrolledMainManager";
+import { RemotePropsContextProvider } from "./context/props";
+import { useRemoteStore } from "./hooks/useRemoteStore";
+import RemoteMainManager from "./components/RemoteMainManager";
 
 export function createFunctionalInstance<
   IComponent extends React.ComponentType<P & FunctionalManagerMethods<any>>,
@@ -29,7 +29,7 @@ export function createFunctionalInstance<
   type Methods = IMethods extends FunctionalMethods ? IMethods : {};
 
   return (props: P) => {
-    const storedCtx = useUncontrolledStore(true);
+    const storedCtx = useRemoteStore(true);
 
     const set: FunctionalManagerMethods<Methods>["set"] = React.useCallback(
       (key, value) => {
@@ -56,9 +56,7 @@ export function createFunctionalInstance<
               const displayName: string = (Comp as any)?.displayName;
               throw new Error(
                 `Cannot Execute Method '${key as string}' ${
-                  displayName
-                    ? `from uncontrolled component '${displayName}'`
-                    : ""
+                  displayName ? `from remote component '${displayName}'` : ""
                 } because the Parent component doesn´t exists in React Tree`
               );
             }
@@ -75,15 +73,15 @@ export function createFunctionalInstance<
     }, []);
 
     return (
-      <UncontrolledPropsContextProvider set={set} watch={watch}>
-        <UncontrolledMainManager>
+      <RemotePropsContextProvider set={set} watch={watch}>
+        <RemoteMainManager>
           {typeof Comp === "function" ? (
             <Comp {...props} set={set} watch={watch} />
           ) : (
             Comp
           )}
-        </UncontrolledMainManager>
-      </UncontrolledPropsContextProvider>
+        </RemoteMainManager>
+      </RemotePropsContextProvider>
     );
   };
 }

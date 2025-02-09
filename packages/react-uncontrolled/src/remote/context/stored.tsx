@@ -3,15 +3,15 @@ import EventEmmiter from "@jsUtils/classes/EventEmitter";
 import type {
   FunctionalMethods,
   InstanceMap,
-  UncontrolledStoredContextProps,
+  RemoteStoredContextProps,
 } from "@pkg/types";
 
-export const UncontrolledStoredContext =
-  React.createContext<UncontrolledStoredContextProps>(
-    undefined as unknown as UncontrolledStoredContextProps
+export const RemoteStoredContext =
+  React.createContext<RemoteStoredContextProps>(
+    undefined as unknown as RemoteStoredContextProps
   );
 
-export function UncontrolledStoredContextProvider({
+export function RemoteStoredContextProvider({
   children,
 }: React.PropsWithChildren) {
   const methodsMapRef = React.useRef<InstanceMap<FunctionalMethods> | null>(
@@ -73,7 +73,7 @@ export function UncontrolledStoredContextProvider({
   );
 
   return (
-    <UncontrolledStoredContext.Provider
+    <RemoteStoredContext.Provider
       value={{
         getMethodEntry,
         setMethodEntry,
@@ -82,6 +82,6 @@ export function UncontrolledStoredContextProvider({
       }}
     >
       {children}
-    </UncontrolledStoredContext.Provider>
+    </RemoteStoredContext.Provider>
   );
 }
