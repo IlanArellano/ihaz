@@ -13,9 +13,10 @@ const createUncontrolledComponent: UncontrolledComponent = (Comp, options) => {
   return {
     Component: context.Parent,
     isMounted: context.isInstanceMounted,
+    getMethods: () => context.managerMethods,
     _internal_: {
-      _methods: context.managerMethods
-    }
+      _methods: context.managerMethods,
+    },
   } as RemoteInstanceIntrisic<any, any>;
 };
 

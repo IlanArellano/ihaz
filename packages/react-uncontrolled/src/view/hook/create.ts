@@ -1,7 +1,7 @@
 import * as React from "react";
 import type {
+  ShowFuncAsyncWithoutContext,
   ShowFuncSyncWithoutContext,
-  ShowFuncWithoutContext,
   ViewContextHook,
   ViewTree,
   ViewUncontrolledComp,
@@ -35,23 +35,27 @@ export default function createViewContextHook(
       tree.changeStatus(contextName, "unmounted");
     };
 
-    const showAsync: ShowFuncWithoutContext = (render, props) => {
+    const showAsync: ShowFuncAsyncWithoutContext = ({ children, props }) => {
       const manager = getMethods();
-      return manager.showAsync(render, props, contextNameRef.current);
+      return manager.showAsync({
+        children,
+        props,
+        context: contextNameRef.current,
+      });
     };
 
-    const show: ShowFuncSyncWithoutContext = (
-      render,
+    const show: ShowFuncSyncWithoutContext = ({
+      children,
       props,
-      onCloseListener
-    ) => {
+      onCloseListener,
+    }) => {
       const manager = getMethods();
-      return manager.show(
-        render,
+      return manager.show({
+        children,
         props,
         onCloseListener,
-        contextNameRef.current
-      );
+        context: contextNameRef.current,
+      });
     };
 
     const getContext = () => contextNameRef.current!;

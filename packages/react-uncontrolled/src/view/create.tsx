@@ -11,7 +11,6 @@ import createViewContextHook from "./hook/create";
 import createUncontrolledComponent from "@pkg/uncontrolled/comp";
 import { BaseView } from "./base";
 import { createShowView } from "./hocs/withShowView";
-import { remoteMethods } from "@pkg/common/methods";
 
 function createTree() {
   return new ViewTree();
@@ -27,19 +26,17 @@ export default function createViewManager(): IViewManager {
     ViewUncontrolledComp
   >(BaseView);
 
-  const getMethods = () => remoteMethods(remote)!;
-
-  const useViewContext = createViewContextHook(getMethods, getTree);
+  const useViewContext = createViewContextHook(remote.getMethods, getTree);
 
   const withViewContext = registerTreeComponent(useViewContext);
 
   let _ShowView: IViewManager["ShowView"];
 
   return {
-    show: (options) => getMethods().show(options),
-    showAsync: (options) => getMethods().showAsync(options),
-    removeEntries: (condition) => getMethods().removeEntries(condition),
-    Component: () => <uncontrolled.Component getTree={getTree} />,
+    show: (options) => remote.getMethods().show(options),
+    showAsync: (options) => remote.getMethods().showAsync(options),
+    removeEntries: (condition) => remote.getMethods().removeEntries(condition),
+    Component: () => <remote.Component getTree={getTree} />,
     withViewContext,
     useViewContext,
     get ShowView() {

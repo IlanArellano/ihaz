@@ -184,13 +184,21 @@ export type UncontrolledComponentResult<P = {}> = {
   isMounted: () => boolean;
 };
 
-export type RemoteInstance<IMethods extends FunctionalMethods, P> = Omit<UncontrolledComponentResult<P>, "getStore">;
+export type RemoteInstance<IMethods extends FunctionalMethods, P> = Omit<
+  UncontrolledComponentResult<P>,
+  "getStore"
+> & {
+  getMethods: () => IMethods;
+};
 
-export type RemoteInstanceIntrisic<IMethods extends FunctionalMethods, P> = RemoteInstance<IMethods, P> & {
+export type RemoteInstanceIntrisic<
+  IMethods extends FunctionalMethods,
+  P
+> = RemoteInstance<IMethods, P> & {
   _internal_: {
-    _methods: IMethods
-  }
-}
+    _methods: IMethods;
+  };
+};
 
 export type UncontrolledComponent = <
   IComponent extends React.ComponentType<any>,
@@ -207,7 +215,7 @@ export type UncontrolledComponent = <
 >(
   Comp: IComponent | React.ReactNode,
   options?: UncontrolledManagerOptions<IMethods>
-) => RemoteInstance<IMethods, P>
+) => RemoteInstance<IMethods, P>;
 
 export type MethodsWithStore<IStore extends FunctionalMethods> = {
   [key: string]: (
