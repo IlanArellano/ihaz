@@ -1,5 +1,5 @@
 import { createFunctionalContextManager } from "./create";
-import type { UncontrolledComponent } from "@pkg/types";
+import type { RemoteInstanceIntrisic, UncontrolledComponent } from "@pkg/types";
 
 const isFunctionalComponent = (component: any) =>
   typeof component === "function" && !component.prototype.isReactComponent;
@@ -12,9 +12,11 @@ const createUncontrolledComponent: UncontrolledComponent = (Comp, options) => {
 
   return {
     Component: context.Parent,
-    isInstanceMounted: context.isInstanceMounted,
-    methods: context.managerMethods,
-  } as any;
+    isMounted: context.isInstanceMounted,
+    _internal_: {
+      _methods: context.managerMethods
+    }
+  } as RemoteInstanceIntrisic<any, any>;
 };
 
 export default createUncontrolledComponent;

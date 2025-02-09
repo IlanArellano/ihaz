@@ -3,6 +3,7 @@ import { act, render, screen } from "@testing-library/react";
 import createUncontrolledFC from "./comp";
 import "@testing-library/jest-dom";
 import type { FunctionalManagerMethods } from "@pkg/types";
+import { remoteMethods } from "@pkg/common/methods";
 
 type IUncontrolledMethods = {
   getCounter: () => number;
@@ -30,7 +31,9 @@ describe("render functionComponentManager", () => {
   it("should method getCounter return a number", () => {
     render(<manager.Component />);
 
-    const getCounter = manager.methods.getCounter();
+    const methods = remoteMethods(manager);
+
+    const getCounter = methods?.getCounter();
 
     setTimeout(() => {
       expect(getCounter).toBe(1);
@@ -38,11 +41,12 @@ describe("render functionComponentManager", () => {
   });
 
   it("should increment the counter state and return the current value", () => {
+    const methods = remoteMethods(manager);
     render(<manager.Component />);
 
-    act(() => manager.methods.setCounter(10));
+    act(() => methods?.setCounter(10));
 
-    const currentValue = manager.methods.getCounter();
+    const currentValue = methods?.getCounter();
 
     setTimeout(() => {
       expect(currentValue).toBe(10);
