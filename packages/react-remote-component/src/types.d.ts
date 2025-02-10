@@ -255,8 +255,6 @@ export type RemoteManagerOptions<IMethods> = Partial<{
   >;
 }>;
 
-export const createRemoteComponent: RemoteComponent;
-
 //createViewManager
 export type OnCloseResult<T> = (result?: T) => void;
 
@@ -423,6 +421,14 @@ export interface ViewContextHook {
 
 export type ViewContextProps = Omit<ViewContextHook, "register" | "unregister">;
 
+//Package Declarations
+
+export declare function useRemoteProps<
+  IMethods extends FunctionalMethods
+>(): FunctionalManagerMethods<IMethods, string>;
+
+export declare const createRemoteComponent: RemoteComponent;
+
 /**Create a view manager that can handle the mount-unmount behavior from the own parent `Tree` component
    * through the `show` and `onClose` methods. Every component is added
    * to internal Parent component state, components inherit a prop called `onClose` when
@@ -459,3 +465,11 @@ const Example = () => {
    * ```
    */
 export declare function createViewManager(): IViewManager;
+
+export declare const ShowView: React.ForwardRefExoticComponent<
+  WithShowViewOptions & React.RefAttributes<ViewRemoteCompWithoutChildren>
+>;
+
+export declare function remoteMethods<IMethods extends FunctionalMethods, P>(
+  instance: RemoteInstance<IMethods, P>
+): IMethods | null;

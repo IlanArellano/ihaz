@@ -1,0 +1,18 @@
+{
+  "name": "react-remote-component",
+  "version": "1.0.0",
+  "type": "module",
+  "engines": {
+    "node": ">=16"
+  },
+  "peerDependencies": {
+    "react": ">=16"
+  },
+  "scripts": {
+    "build": "rollup -c && gulp copy-files",
+    "build:windows": "set NODE_ENV=production&& set INPUT_DIR=src/&& set OUTPUT_DIR=lib/&& npm run build",
+    "build:linux": "NODE_ENV=production && INPUT_DIR=src/ && OUTPUT_DIR=lib/ && npm run build",
+    "build:mac": "export NODE_ENV=production && export INPUT_DIR=src/ && export OUTPUT_DIR=lib/ && npm run build",
+    "test": "jest --watchAll"
+  }
+}
