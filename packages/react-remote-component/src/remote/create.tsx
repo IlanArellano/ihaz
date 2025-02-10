@@ -11,13 +11,17 @@ import { RemoteMainContextProvider } from "./context/main";
 import { RemoteStoredContextProvider } from "./context/stored";
 
 export function createFunctionalContextManager<
-  IComponent extends React.ComponentType<P & FunctionalManagerMethods<any>>,
+  IComponent extends React.ComponentType<
+    P & React.PropsWithChildren & FunctionalManagerMethods<any>
+  >,
   IMethods = IComponent extends React.ComponentType<infer IProps>
     ? IProps extends FunctionalManagerMethods<infer Methods>
       ? Methods
       : {}
     : {},
-  P = IComponent extends React.ComponentType<infer IProps>
+  P extends React.PropsWithChildren = IComponent extends React.ComponentType<
+    infer IProps
+  >
     ? Omit<IProps, keyof FunctionalManagerMethods<any>>
     : {}
 >(

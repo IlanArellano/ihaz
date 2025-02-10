@@ -3,8 +3,11 @@ import { useRemoteMainComponent } from "../hooks/useRemoteMainComponent";
 import { logger } from "@pkg/common/logger";
 
 export default function RemoteMainManager({
+  componentChildren,
   children,
-}: React.PropsWithChildren): React.JSX.Element {
+}: React.PropsWithChildren<{
+  componentChildren: React.ReactNode;
+}>): React.JSX.Element {
   const ctx = useRemoteMainComponent(true);
 
   React.useEffect(() => {
@@ -16,7 +19,8 @@ export default function RemoteMainManager({
   }, []);
 
   React.useEffect(() => {
-    const isGlobal = children === null || children === undefined;
+    const isGlobal =
+      componentChildren === null || componentChildren === undefined;
     const currentProps = ctx.getInternalProps();
     if (currentProps && currentProps.isGlobal === isGlobal) return;
     if (isGlobal) {
@@ -42,7 +46,7 @@ export default function RemoteMainManager({
     ctx.setInternalProps({
       isGlobal,
     });
-  }, [children]);
+  }, [componentChildren]);
 
   return <React.Fragment>{children}</React.Fragment>;
 }

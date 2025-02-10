@@ -211,7 +211,7 @@ export type RemoteComponent = <
     : {},
   P = IComponent extends React.ComponentType<infer IProps>
     ? Omit<IProps, keyof FunctionalManagerMethods<any>>
-    : {}
+    : {} & React.PropsWithChildren
 >(
   Comp: IComponent | React.ReactNode,
   options?: RemoteManagerOptions<IMethods>

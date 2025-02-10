@@ -9,13 +9,17 @@ import { useRemoteStore } from "./hooks/useRemoteStore";
 import RemoteMainManager from "./components/RemoteMainManager";
 
 export function createFunctionalInstance<
-  IComponent extends React.ComponentType<P & FunctionalManagerMethods<any>>,
+  IComponent extends React.ComponentType<
+    P & React.PropsWithChildren & FunctionalManagerMethods<any>
+  >,
   IMethods = IComponent extends React.ComponentType<infer IProps>
     ? IProps extends FunctionalManagerMethods<infer Methods>
       ? Methods
       : {}
     : {},
-  P = IComponent extends React.ComponentType<infer IProps>
+  P extends React.PropsWithChildren = IComponent extends React.ComponentType<
+    infer IProps
+  >
     ? Omit<IProps, keyof FunctionalManagerMethods<any>>
     : {}
 >(
@@ -74,7 +78,7 @@ export function createFunctionalInstance<
 
     return (
       <RemotePropsContextProvider set={set} watch={watch}>
-        <RemoteMainManager>
+        <RemoteMainManager componentChildren={props.children}>
           {typeof Comp === "function" ? (
             <Comp {...props} set={set} watch={watch} />
           ) : (
